@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sports Betting Middle Slider</title>
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 24px;
+      max-width: 900px;
+    }
+
+    h1 { margin-bottom: 4px; }
+    p { color: #555; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 4px;
+    }
+
+    input[type="range"] {
+      padding: 0;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .big {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid #ccc;
+      margin-top: 8px;
+    }
+
+    .ok { border-color: #0a0; }
+    .warn { border-color: #a60; }
+    .bad { border-color: #a00; }
+  </style>
+</head>
+
+<body>
+  <h1>Middle / Hedge Slider</h1>
+  <p>
+    Fixed stake on Bet A. Slide Bet B to see profit/loss for each outcome.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Bet A</h2>
+
+      <label>American Odds</label>
+      <input id="oddsA" value="-110">
+
+      <label>Stake ($)</label>
+      <input id="stakeA" value="100">
+    </div>
+
+    <div class="card">
+      <h2>Bet B</h2>
+
+      <label>American Odds</label>
+      <input id="oddsB" value="-105">
+
+      <label>Max Stake ($)</label>
+      <input id="maxB" value="300">
+
+      <label>
+        Stake B:
+        <span class="mono" id="stakeBLabel">$0.00</span>
+      </label>
+      <input id="stakeB" type="range" min="0" max="300" value="100" step="1">
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h2>Outcomes</h2>
+
+    <div class="grid">
+      <div>
+        <div>If Bet A Wins</div>
+        <div class="big mono" id="netA">—</div>
+      </div>
+
+      <div>
+        <div>If Bet B Wins</div>
+        <div class="big mono" id="netB">—</div>
+      </div>
+    </div>
+
+    <div>
+      <span class="pill mono" id="status">—</span>
+      <div id="details" style="margin-top:6px; color:#555;">—</div>
+    </div>
+  </div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function num(v) {
+    return Number(String(v).replace(/[^0-9.+-]/g, ""));
+  }
+
+  function americanToDecimal(a) {
+    if (a > 0) return 1 + a / 100;
+    return 1 + 100 / Math.abs(a);
+  }
+
+  function money(n) {
+    const s = n < 0 ? "-" : "";
+    return s + "$" + Math.abs(n).toFixed(2);
+  }
+
+  function update() {
+    const oddsA = num($("oddsA").value);
+    const oddsB = num($("oddsB").value);
+    const stakeA = num($("stakeA").value);
+    const maxB   = num($("maxB").value);
+
+    $("stakeB").max = maxB;
+    const stakeB = num($("stakeB").value);
+    $("stakeBLabel").textContent = money(stakeB);
+
+    if (![oddsA, oddsB, stakeA, stakeB].every(Number.isFinite)) {
+      $("netA").textContent = "—";
+      $("netB").textContent = "—";
+      $("status").textContent = "Invalid input";
+      $("status").className = "pill mono warn";
+      $("details").textContent = "Check odds and stakes.";
+      return;
+    }
+
+    const decA = americanToDecimal(oddsA);
+    const decB = americanToDecimal(oddsB);
+
+    const profitA = stakeA * decA - stakeA;
+    const profitB = stakeB * decB - stakeB;
+
+    const netA = profitA - stakeB;
+    const netB = profitB - stakeA;
+
+    $("netA").textContent = money(netA);
+    $("netB").textContent = money(netB);
+
+    const min = Math.min(netA, netB);
+    const max = Math.max(netA, netB);
+
+    if (min > 0) {
+      $("status").textContent = "Arbitrage";
+      $("status").className = "pill mono ok";
+      $("details").textContent = "Guaranteed profit both outcomes.";
+    } else if (max > 0) {
+      $("status").textContent = "Hedge / Middle Attempt";
+      $("status").className = "pill mono warn";
+      $("details").textContent = "Slider controls exposure.";
+    } else {
+      $("status").textContent = "Negative Both Ways";
+      $("status").className = "pill mono bad";
+      $("details").textContent = "No profitable configuration.";
+    }
+  }
+
+  ["oddsA","oddsB","stakeA","maxB","stakeB"].forEach(id =>
+    $(id).addEventListener("input", update)
+  );
+
+  update();
+</script>
+
+</body>
+</html>
