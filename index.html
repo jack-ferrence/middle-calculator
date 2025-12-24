@@ -1,200 +1,1227 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sports Betting Middle Slider</title>
-
+  <title>Will’s Middling Calculator</title>
   <style>
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      margin: 24px;
-      max-width: 900px;
+    :root{
+      --bg:#0b0f17;
+      --panel:#111827;
+      --panel2:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#243041;
+      --good:#34d399;
+      --bad:#fb7185;
+      --warn:#fbbf24;
+      --accent:#60a5fa;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg, #070a10 0%, var(--bg) 60%, #070a10 100%);
+      color:var(--text);
+      font-family:var(--sans);
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:18px 14px 28px;
+    }
+    header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 6px 16px;
+      border-bottom:1px solid var(--line);
+      margin-bottom:16px;
+    }
+    h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+      max-width:760px;
+    }
+    .pill{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:6px 10px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:999px;
+      color:var(--muted);
+      white-space:nowrap;
     }
 
-    h1 { margin-bottom: 4px; }
-    p { color: #555; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
 
-    .grid {
-      display: grid;
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.02) 100%);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
+    }
+    .card h2{
+      margin:0 0 10px 0;
+      font-size:14px;
+      color:var(--muted);
+      font-weight:600;
+      letter-spacing:.2px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .card h2 .small{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+      font-weight:500;
+    }
+    .row{
+      display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap:10px;
+    }
+    .row3{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-bottom:10px;
+    }
+    label{
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+    label span.note{
+      font-family:var(--mono);
+      font-size:11px;
+      color:rgba(156,163,175,.85);
+    }
+    input, select{
+      width:100%;
+      padding:10px 10px;
+      background:rgba(0,0,0,.22);
+      border:1px solid var(--line);
+      border-radius:10px;
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    input:focus, select:focus{
+      border-color: rgba(96,165,250,.65);
+      box-shadow: 0 0 0 3px rgba(96,165,250,.15);
+    }
+    .inline{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .inline > *{flex:1}
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
     }
 
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 16px;
+    .big{
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:.2px;
+      margin:6px 0 0;
+    }
+    .big small{
+      font-size:12px;
+      font-weight:600;
+      color:var(--muted);
+      margin-left:6px;
+      font-family:var(--mono);
+    }
+    .kpis{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .kpi{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      background:rgba(0,0,0,.16);
+    }
+    .kpi .label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .kpi .val{
+      font-family:var(--mono);
+      font-size:16px;
+      font-weight:700;
+    }
+    .good{color:var(--good)}
+    .bad{color:var(--bad)}
+    .warn{color:var(--warn)}
+    .mono{font-family:var(--mono)}
+    .sep{
+      height:1px;
+      background:var(--line);
+      margin:12px 0;
     }
 
-    label {
-      display: block;
-      font-weight: 600;
-      margin-top: 12px;
+    .sliderWrap{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      background:rgba(0,0,0,.16);
+    }
+    input[type="range"]{
+      padding:0;
+      height:28px;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+    }
+    .sliderTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-top: 4px;
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-family:var(--mono);
+      font-size:12px;
+      overflow:hidden;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.14);
     }
-
-    input[type="range"] {
-      padding: 0;
+    thead th{
+      text-align:left;
+      padding:10px 10px;
+      color:rgba(229,231,235,.92);
+      border-bottom:1px solid var(--line);
+      background:rgba(0,0,0,.22);
+      font-weight:700;
     }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-variant-numeric: tabular-nums;
+    tbody td{
+      padding:9px 10px;
+      border-bottom:1px solid rgba(36,48,65,.65);
+      color:rgba(229,231,235,.9);
+      vertical-align:top;
     }
-
-    .big {
-      font-size: 22px;
-      font-weight: 700;
+    tbody tr:last-child td{border-bottom:none}
+    .tag{
+      display:inline-block;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:rgba(229,231,235,.92);
+      font-size:11px;
+      font-family:var(--mono);
     }
-
-    .pill {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid #ccc;
-      margin-top: 8px;
+    .right{
+      text-align:right;
     }
-
-    .ok { border-color: #0a0; }
-    .warn { border-color: #a60; }
-    .bad { border-color: #a00; }
+    .foot{
+      margin-top:12px;
+      color:rgba(156,163,175,.85);
+      font-size:11px;
+      line-height:1.35;
+    }
   </style>
 </head>
-
 <body>
-  <h1>Middle / Hedge Slider</h1>
-  <p>
-    Fixed stake on Bet A. Slide Bet B to see profit/loss for each outcome.
-  </p>
-
-  <div class="grid">
-    <div class="card">
-      <h2>Bet A</h2>
-
-      <label>American Odds</label>
-      <input id="oddsA" value="-110">
-
-      <label>Stake ($)</label>
-      <input id="stakeA" value="100">
-    </div>
-
-    <div class="card">
-      <h2>Bet B</h2>
-
-      <label>American Odds</label>
-      <input id="oddsB" value="-105">
-
-      <label>Max Stake ($)</label>
-      <input id="maxB" value="300">
-
-      <label>
-        Stake B:
-        <span class="mono" id="stakeBLabel">$0.00</span>
-      </label>
-      <input id="stakeB" type="range" min="0" max="300" value="100" step="1">
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:16px;">
-    <h2>Outcomes</h2>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Will’s Middling Calculator</h1>
+        <div class="subtitle">
+          Enter your pregame bet and the live “middle” hedge candidate. Use the slider to size the live bet and see every outcome payout fast.
+        </div>
+      </div>
+      <div class="pill" id="statusPill">Neutral calculator • American odds</div>
+    </header>
 
     <div class="grid">
-      <div>
-        <div>If Bet A Wins</div>
-        <div class="big mono" id="netA">—</div>
+      <div class="card">
+        <h2>
+          Setup
+          <span class="small mono" id="marketHint"></span>
+        </h2>
+
+        <div class="row">
+          <div class="field">
+            <label>Market</label>
+            <select id="market">
+              <option value="spread">Spread</option>
+              <option value="total">Total (Over/Under)</option>
+              <option value="moneyline">Moneyline</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Sport (for EV estimate)</label>
+            <select id="sport">
+              <option value="nfl">NFL</option>
+              <option value="nba">NBA</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="field">
+            <label>Team A name <span class="note mono">(reference team)</span></label>
+            <input id="teamA" value="Packers" />
+          </div>
+          <div class="field">
+            <label>Team B name</label>
+            <input id="teamB" value="Bears" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Primary bet side</label>
+            <select id="sideA">
+              <option value="A">Team A</option>
+              <option value="B">Team B</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Live bet side</label>
+            <select id="sideB">
+              <option value="B">Team B</option>
+              <option value="A">Team A</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" id="lineRow">
+          <div class="field">
+            <label>Primary line <span class="note mono">(spread/total)</span></label>
+            <input id="lineA" type="number" step="0.5" value="-3.5" />
+          </div>
+          <div class="field">
+            <label>Live line <span class="note mono">(spread/total)</span></label>
+            <input id="lineB" type="number" step="0.5" value="+7.5" />
+          </div>
+        </div>
+
+        <div class="row" id="ouRow" style="display:none;">
+          <div class="field">
+            <label>Primary: Over/Under</label>
+            <select id="ouA">
+              <option value="over">Over</option>
+              <option value="under">Under</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Live: Over/Under</label>
+            <select id="ouB">
+              <option value="under">Under</option>
+              <option value="over">Over</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" id="mlRow" style="display:none;">
+          <div class="field">
+            <label>Primary: pick winner</label>
+            <select id="mlA">
+              <option value="A">Team A wins</option>
+              <option value="B">Team B wins</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Live: pick winner</label>
+            <select id="mlB">
+              <option value="B">Team B wins</option>
+              <option value="A">Team A wins</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row3">
+          <div class="field">
+            <label>Primary stake ($)</label>
+            <input id="stakeA" type="number" step="1" value="50" />
+          </div>
+          <div class="field">
+            <label>Primary odds <span class="note mono">(American)</span></label>
+            <input id="oddsA" type="number" step="1" value="-110" />
+          </div>
+          <div class="field">
+            <label>Typical unit ($) <span class="note mono">(display only)</span></label>
+            <input id="unit" type="number" step="1" value="20" />
+          </div>
+        </div>
+
+        <div class="row3">
+          <div class="field">
+            <label>Live odds <span class="note mono">(American)</span></label>
+            <input id="oddsB" type="number" step="1" value="-110" />
+          </div>
+          <div class="field">
+            <label>Odds drift range <span class="note mono">(±)</span></label>
+            <input id="drift" type="number" step="1" value="15" />
+          </div>
+          <div class="field">
+            <label>Show EV estimate</label>
+            <select id="showEV">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="evBox" style="margin-top:6px;">
+          <div class="sep"></div>
+          <div class="row3">
+            <div class="field">
+              <label>Assumed mean <span class="note mono">(margin or total)</span></label>
+              <input id="evMean" type="number" step="0.5" value="-3.5" />
+            </div>
+            <div class="field">
+              <label>Assumed SD <span class="note mono">(NFL ~13.5, NBA ~11)</span></label>
+              <input id="evSD" type="number" step="0.1" value="13.5" />
+            </div>
+            <div class="field">
+              <label>Eval range width <span class="note mono">(±)</span></label>
+              <input id="evRange" type="number" step="1" value="45" />
+            </div>
+          </div>
+          <div class="muted">
+            EV uses a normal approximation over the chosen outcome variable (margin for spread/ML, total points for totals). It’s optional; the payout table is the main truth.
+          </div>
+        </div>
+
+        <div class="foot">
+          Push rules: spread/total push if exact line. Moneyline has no push. This tool is a calculator only.
+        </div>
       </div>
 
-      <div>
-        <div>If Bet B Wins</div>
-        <div class="big mono" id="netB">—</div>
-      </div>
-    </div>
+      <div class="card">
+        <h2>
+          Live Bet Slider
+          <span class="small mono" id="unitsHint"></span>
+        </h2>
 
-    <div>
-      <span class="pill mono" id="status">—</span>
-      <div id="details" style="margin-top:6px; color:#555;">—</div>
+        <div class="sliderWrap">
+          <div class="sliderTop">
+            <div class="muted">Live stake ($)</div>
+            <div class="mono" style="font-weight:800; font-size:16px" id="stakeBLabel">$0</div>
+          </div>
+          <input id="stakeSlider" type="range" min="0" max="250" value="0" step="1" />
+          <div class="inline" style="margin-top:10px;">
+            <div class="field" style="margin:0;">
+              <label>Or type it</label>
+              <input id="stakeB" type="number" step="1" value="0" />
+            </div>
+            <div class="field" style="margin:0;">
+              <label>Max slider ($)</label>
+              <input id="sliderMax" type="number" step="10" value="250" />
+            </div>
+          </div>
+          <div class="muted" style="margin-top:8px;">
+            Set Max slider high enough to cover your typical hedge sizing. Default: 5× the primary stake.
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div>
+          <div class="muted">Right now (based on entered odds):</div>
+          <div class="big mono" id="headlineProfit">$0.00 <small id="headlineRange">(range: $0.00 to $0.00)</small></div>
+          <div class="kpis">
+            <div class="kpi">
+              <div class="label">
+                Worst-case profit
+                <span class="tag" id="wcTag">min</span>
+              </div>
+              <div class="val" id="worstCase">$0.00</div>
+              <div class="muted mono" id="worstCaseRange"></div>
+            </div>
+            <div class="kpi">
+              <div class="label">
+                Best-case profit
+                <span class="tag" id="bcTag">max</span>
+              </div>
+              <div class="val" id="bestCase">$0.00</div>
+              <div class="muted mono" id="bestCaseRange"></div>
+            </div>
+            <div class="kpi">
+              <div class="label">
+                Middle window (if any)
+                <span class="tag">interval</span>
+              </div>
+              <div class="val" id="middleWindow">—</div>
+              <div class="muted mono" id="middleNote"></div>
+            </div>
+            <div class="kpi">
+              <div class="label">
+                EV (optional)
+                <span class="tag">model</span>
+              </div>
+              <div class="val" id="evOut">—</div>
+              <div class="muted mono" id="evOutNote"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <h2 style="margin-top:0;">Outcome Table <span class="small mono">profits, payouts, and pushes</span></h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Region</th>
+              <th>Primary</th>
+              <th>Live</th>
+              <th class="right">Profit</th>
+              <th class="right">Profit (odds ±)</th>
+            </tr>
+          </thead>
+          <tbody id="regionRows"></tbody>
+        </table>
+
+        <div class="sep"></div>
+
+        <h2 style="margin-top:0;">Detail Grid <span class="small mono">by score margin/total</span></h2>
+        <div class="muted" style="margin-bottom:10px;">
+          Shows profits across a band of outcomes so you can see exactly where the middle lives.
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th id="gridHeaderX">Outcome</th>
+              <th class="right">Profit</th>
+              <th class="right">Profit (odds ±)</th>
+            </tr>
+          </thead>
+          <tbody id="gridRows"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
 <script>
-  const $ = id => document.getElementById(id);
+/* ----------------------------- core math ----------------------------- */
 
-  function num(v) {
-    return Number(String(v).replace(/[^0-9.+-]/g, ""));
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+function isFiniteNumber(x){ return Number.isFinite(x) && !Number.isNaN(x); }
+
+function americanToDecimal(odds){
+  // Decimal includes stake returned on a win.
+  // +150 => 2.5 ; -110 => 1 + 100/110 = 1.909...
+  odds = Number(odds);
+  if (!isFiniteNumber(odds) || odds === 0) return NaN;
+  if (odds > 0) return 1 + (odds / 100);
+  return 1 + (100 / Math.abs(odds));
+}
+
+function profitIfWin(stake, odds){
+  const dec = americanToDecimal(odds);
+  if (!isFiniteNumber(dec)) return NaN;
+  return stake * (dec - 1);
+}
+
+function settleBet(result){ // 'win'|'lose'|'push'
+  return result;
+}
+
+function betResultSpread(teamPicked /*'A'|'B'*/, line, marginA){
+  // marginA = TeamA score - TeamB score
+  // If you picked A at line L: win if marginA + L > 0
+  // If you picked B at line L: interpret as B margin + L > 0 => (-marginA) + L > 0
+  const m = (teamPicked === 'A') ? marginA : (-marginA);
+  const x = m + line;
+  if (x > 0) return 'win';
+  if (x < 0) return 'lose';
+  return 'push';
+}
+
+function betResultTotal(side /*'over'|'under'*/, line, totalPts){
+  const x = totalPts - line;
+  if (x > 0) return side === 'over' ? 'win' : 'lose';
+  if (x < 0) return side === 'under' ? 'win' : 'lose';
+  return 'push';
+}
+
+function betResultML(teamPicked /*'A'|'B'*/, winner /*'A'|'B'*/){
+  return (teamPicked === winner) ? 'win' : 'lose';
+}
+
+function profitForOneBet(result, stake, odds){
+  // Profit only (not total return)
+  if (result === 'win') return profitIfWin(stake, odds);
+  if (result === 'lose') return -stake;
+  return 0; // push
+}
+
+function profitRangeForOneBet(result, stake, odds, drift){
+  const oMid = Number(odds);
+  const d = Math.abs(Number(drift));
+  const oLo = oMid - d;
+  const oHi = oMid + d;
+
+  // American odds: "better" can be either direction depending on sign.
+  // For a win payout, decimal is monotonic in odds value:
+  // Higher odds number => higher decimal. (true across negative/positive when comparing numerically)
+  // Example: -125 (1.8) vs -110 (1.909) vs +105 (2.05). Higher numeric => higher decimal.
+  // So use min/max by numeric odds.
+  const oMin = Math.min(oLo, oHi);
+  const oMax = Math.max(oLo, oHi);
+
+  const pMin = profitForOneBet(result, stake, oMin);
+  const pMax = profitForOneBet(result, stake, oMax);
+  return [Math.min(pMin,pMax), Math.max(pMin,pMax)];
+}
+
+// normal CDF approximation (Abramowitz-Stegun)
+function normCdf(z){
+  const t = 1 / (1 + 0.2316419 * Math.abs(z));
+  const d = 0.3989423 * Math.exp(-z*z/2);
+  let p = d*t*(0.3193815 + t*(-0.3565638 + t*(1.781478 + t*(-1.821256 + t*1.330274))));
+  if (z > 0) p = 1 - p;
+  return p;
+}
+
+function normalProbBetween(a, b, mean, sd){
+  if (!isFiniteNumber(sd) || sd <= 0) return NaN;
+  const za = (a - mean) / sd;
+  const zb = (b - mean) / sd;
+  return normCdf(zb) - normCdf(za);
+}
+
+/* ----------------------------- UI helpers ----------------------------- */
+
+function money(x){
+  if (!isFiniteNumber(x)) return '—';
+  const sign = x < 0 ? '-' : '';
+  const abs = Math.abs(x);
+  return sign + '$' + abs.toFixed(2);
+}
+
+function moneyRange(lo, hi){
+  if (!isFiniteNumber(lo) || !isFiniteNumber(hi)) return '—';
+  return '(' + money(lo) + ' to ' + money(hi) + ')';
+}
+
+function pickLabel(side, teamA, teamB){
+  if (side === 'A') return teamA;
+  if (side === 'B') return teamB;
+  return side;
+}
+
+/* ----------------------------- app state ----------------------------- */
+
+const els = {
+  market: document.getElementById('market'),
+  sport: document.getElementById('sport'),
+  teamA: document.getElementById('teamA'),
+  teamB: document.getElementById('teamB'),
+  sideA: document.getElementById('sideA'),
+  sideB: document.getElementById('sideB'),
+  lineA: document.getElementById('lineA'),
+  lineB: document.getElementById('lineB'),
+  ouA: document.getElementById('ouA'),
+  ouB: document.getElementById('ouB'),
+  mlA: document.getElementById('mlA'),
+  mlB: document.getElementById('mlB'),
+  stakeA: document.getElementById('stakeA'),
+  oddsA: document.getElementById('oddsA'),
+  oddsB: document.getElementById('oddsB'),
+  drift: document.getElementById('drift'),
+  unit: document.getElementById('unit'),
+  showEV: document.getElementById('showEV'),
+  evBox: document.getElementById('evBox'),
+  evMean: document.getElementById('evMean'),
+  evSD: document.getElementById('evSD'),
+  evRange: document.getElementById('evRange'),
+
+  lineRow: document.getElementById('lineRow'),
+  ouRow: document.getElementById('ouRow'),
+  mlRow: document.getElementById('mlRow'),
+
+  stakeSlider: document.getElementById('stakeSlider'),
+  stakeB: document.getElementById('stakeB'),
+  sliderMax: document.getElementById('sliderMax'),
+
+  stakeBLabel: document.getElementById('stakeBLabel'),
+  unitsHint: document.getElementById('unitsHint'),
+  marketHint: document.getElementById('marketHint'),
+
+  headlineProfit: document.getElementById('headlineProfit'),
+  headlineRange: document.getElementById('headlineRange'),
+
+  worstCase: document.getElementById('worstCase'),
+  bestCase: document.getElementById('bestCase'),
+  worstCaseRange: document.getElementById('worstCaseRange'),
+  bestCaseRange: document.getElementById('bestCaseRange'),
+
+  middleWindow: document.getElementById('middleWindow'),
+  middleNote: document.getElementById('middleNote'),
+
+  evOut: document.getElementById('evOut'),
+  evOutNote: document.getElementById('evOutNote'),
+
+  regionRows: document.getElementById('regionRows'),
+  gridHeaderX: document.getElementById('gridHeaderX'),
+  gridRows: document.getElementById('gridRows'),
+};
+
+function syncMarketVisibility(){
+  const m = els.market.value;
+  els.lineRow.style.display = (m === 'spread' || m === 'total') ? '' : 'none';
+  els.ouRow.style.display = (m === 'total') ? '' : 'none';
+  els.mlRow.style.display = (m === 'moneyline') ? '' : 'none';
+
+  els.marketHint.textContent =
+    m === 'spread' ? 'Outcome variable: margin (Team A - Team B)' :
+    m === 'total' ? 'Outcome variable: total points' :
+    'Outcome variable: winner';
+
+  els.gridHeaderX.textContent =
+    m === 'spread' ? 'Margin (A - B)' :
+    m === 'total' ? 'Total points' :
+    'Winner';
+
+  // keep sides sensible
+  if (m === 'moneyline'){
+    // ML picks use mlA/mlB, but keep side dropdowns aligned for labeling
+    els.sideA.value = els.mlA.value;
+    els.sideB.value = els.mlB.value;
+  }
+}
+
+function syncEVDefaults(){
+  const sport = els.sport.value;
+  const mkt = els.market.value;
+
+  if (sport === 'nfl'){
+    els.evSD.value = (mkt === 'total') ? '9.5' : '13.5';
+  } else if (sport === 'nba'){
+    els.evSD.value = (mkt === 'total') ? '16.0' : '11.0';
   }
 
-  function americanToDecimal(a) {
-    if (a > 0) return 1 + a / 100;
-    return 1 + 100 / Math.abs(a);
+  // reasonable mean defaults: use primary line for spread/total; 0 for ML
+  if (mkt === 'spread'){
+    els.evMean.value = String(Number(els.lineA.value) * (els.sideA.value === 'A' ? -1 : -1)); // keep aligned with marginA mean ~ -spread for A? simpler: let user set it; default to lineA as-is
+    els.evMean.value = String(Number(els.lineA.value)); // user sees same sign convention as entered line on picked side; EV is optional anyway
+  } else if (mkt === 'total'){
+    els.evMean.value = String(Number(els.lineA.value));
+  } else {
+    els.evMean.value = '0';
+  }
+}
+
+function syncSliderMax(){
+  const sA = Number(els.stakeA.value);
+  const cur = Number(els.sliderMax.value);
+  if (!isFiniteNumber(cur) || cur <= 0){
+    els.sliderMax.value = String(Math.max(100, Math.round(sA*5)));
+  }
+  const max = Number(els.sliderMax.value);
+  els.stakeSlider.max = String(max);
+  els.stakeSlider.min = '0';
+  els.stakeSlider.step = '1';
+  const sB = Number(els.stakeB.value);
+  const clamped = clamp(isFiniteNumber(sB)?sB:0, 0, max);
+  els.stakeB.value = String(clamped);
+  els.stakeSlider.value = String(clamped);
+  els.stakeBLabel.textContent = '$' + clamped.toFixed(0);
+}
+
+function setUnitsHint(){
+  const u = Number(els.unit.value);
+  const sA = Number(els.stakeA.value);
+  const sB = Number(els.stakeB.value);
+  const uTxt = isFiniteNumber(u) && u>0 ? u : 20;
+  const aU = isFiniteNumber(sA) ? (sA/uTxt) : 0;
+  const bU = isFiniteNumber(sB) ? (sB/uTxt) : 0;
+  els.unitsHint.textContent = `${aU.toFixed(2)}u primary • ${bU.toFixed(2)}u live`;
+}
+
+/* ----------------------------- settlement engine ----------------------------- */
+
+function currentConfig(){
+  const market = els.market.value;
+  const teamA = els.teamA.value.trim() || 'Team A';
+  const teamB = els.teamB.value.trim() || 'Team B';
+
+  const stakeA = Number(els.stakeA.value);
+  const stakeB = Number(els.stakeB.value);
+
+  const oddsA = Number(els.oddsA.value);
+  const oddsB = Number(els.oddsB.value);
+  const drift = Math.abs(Number(els.drift.value));
+
+  const sideA = els.sideA.value; // 'A'|'B'
+  const sideB = els.sideB.value;
+
+  const lineA = Number(els.lineA.value);
+  const lineB = Number(els.lineB.value);
+
+  const ouA = els.ouA.value;
+  const ouB = els.ouB.value;
+
+  const mlA = els.mlA.value;
+  const mlB = els.mlB.value;
+
+  return { market, teamA, teamB, stakeA, stakeB, oddsA, oddsB, drift, sideA, sideB, lineA, lineB, ouA, ouB, mlA, mlB };
+}
+
+function settleCombinedForOutcome(cfg, outcomeVal){
+  // outcomeVal:
+  // - spread: marginA (A-B)
+  // - total: total points
+  // - moneyline: 'A' or 'B' winner
+  const { market } = cfg;
+
+  let rA, rB;
+  if (market === 'spread'){
+    rA = betResultSpread(cfg.sideA, cfg.lineA, outcomeVal);
+    rB = betResultSpread(cfg.sideB, cfg.lineB, outcomeVal);
+  } else if (market === 'total'){
+    rA = betResultTotal(cfg.ouA, cfg.lineA, outcomeVal);
+    rB = betResultTotal(cfg.ouB, cfg.lineB, outcomeVal);
+  } else {
+    rA = betResultML(cfg.mlA, outcomeVal);
+    rB = betResultML(cfg.mlB, outcomeVal);
   }
 
-  function money(n) {
-    const s = n < 0 ? "-" : "";
-    return s + "$" + Math.abs(n).toFixed(2);
+  const pA = profitForOneBet(rA, cfg.stakeA, cfg.oddsA);
+  const pB = profitForOneBet(rB, cfg.stakeB, cfg.oddsB);
+  const total = pA + pB;
+
+  const [pAlo, pAhi] = profitRangeForOneBet(rA, cfg.stakeA, cfg.oddsA, cfg.drift);
+  const [pBlo, pBhi] = profitRangeForOneBet(rB, cfg.stakeB, cfg.oddsB, cfg.drift);
+  const totalLo = pAlo + pBlo;
+  const totalHi = pAhi + pBhi;
+
+  return { rA, rB, total, totalLo, totalHi, pA, pB };
+}
+
+function regionsForMarket(cfg){
+  // Returns regions with human labels + boundaries
+  const m = cfg.market;
+
+  if (m === 'moneyline'){
+    return [
+      { key:'A', label:`${cfg.teamA} wins`, outcome:'A' },
+      { key:'B', label:`${cfg.teamB} wins`, outcome:'B' },
+    ];
   }
 
-  function update() {
-    const oddsA = num($("oddsA").value);
-    const oddsB = num($("oddsB").value);
-    const stakeA = num($("stakeA").value);
-    const maxB   = num($("maxB").value);
+  if (m === 'total'){
+    // regions: below min(lineA,lineB), between, above max
+    const a = cfg.lineA, b = cfg.lineB;
+    const lo = Math.min(a,b), hi = Math.max(a,b);
+    return [
+      { key:'low', label:`Total < ${lo}`, range:(x)=> x < lo },
+      { key:'mid', label:`${lo} < Total < ${hi}`, range:(x)=> x > lo && x < hi },
+      { key:'high', label:`Total > ${hi}`, range:(x)=> x > hi },
+      { key:'pushA', label:`Total = ${a} (push primary)`, exact:a },
+      { key:'pushB', label:`Total = ${b} (push live)`, exact:b },
+    ];
+  }
 
-    $("stakeB").max = maxB;
-    const stakeB = num($("stakeB").value);
-    $("stakeBLabel").textContent = money(stakeB);
-
-    if (![oddsA, oddsB, stakeA, stakeB].every(Number.isFinite)) {
-      $("netA").textContent = "—";
-      $("netB").textContent = "—";
-      $("status").textContent = "Invalid input";
-      $("status").className = "pill mono warn";
-      $("details").textContent = "Check odds and stakes.";
-      return;
-    }
-
-    const decA = americanToDecimal(oddsA);
-    const decB = americanToDecimal(oddsB);
-
-    const profitA = stakeA * decA - stakeA;
-    const profitB = stakeB * decB - stakeB;
-
-    const netA = profitA - stakeB;
-    const netB = profitB - stakeA;
-
-    $("netA").textContent = money(netA);
-    $("netB").textContent = money(netB);
-
-    const min = Math.min(netA, netB);
-    const max = Math.max(netA, netB);
-
-    if (min > 0) {
-      $("status").textContent = "Arbitrage";
-      $("status").className = "pill mono ok";
-      $("details").textContent = "Guaranteed profit both outcomes.";
-    } else if (max > 0) {
-      $("status").textContent = "Hedge / Middle Attempt";
-      $("status").className = "pill mono warn";
-      $("details").textContent = "Slider controls exposure.";
+  // spread
+  // use marginA outcome variable
+  // create regions around both lines translated to the picked sides:
+  // easiest: just define by comparing marginA to the two "decision points" for each bet in marginA space.
+  // For a bet on picked team T with line L, win threshold in that team's margin is -L.
+  // Convert to marginA threshold:
+  // - if bet is on A: win if marginA > -L ; push if = -L
+  // - if bet is on B: win if marginA < L ; push if = L  (since -marginA + L > 0 => marginA < L)
+  function thresholds(teamPicked, line){
+    if (teamPicked === 'A'){
+      return { winIf: (mA)=> mA > -line, pushAt: -line, dir:'gt', cut: -line };
     } else {
-      $("status").textContent = "Negative Both Ways";
-      $("status").className = "pill mono bad";
-      $("details").textContent = "No profitable configuration.";
+      return { winIf: (mA)=> mA < line, pushAt: line, dir:'lt', cut: line };
     }
   }
 
-  ["oddsA","oddsB","stakeA","maxB","stakeB"].forEach(id =>
-    $(id).addEventListener("input", update)
-  );
+  const tA = thresholds(cfg.sideA, cfg.lineA);
+  const tB = thresholds(cfg.sideB, cfg.lineB);
 
-  update();
+  const cuts = [tA.cut, tB.cut].sort((x,y)=>x-y);
+  const c1 = cuts[0], c2 = cuts[1];
+
+  return [
+    { key:'left', label:`Margin (A-B) < ${c1}`, range:(x)=> x < c1 },
+    { key:'mid',  label:`${c1} < Margin (A-B) < ${c2}`, range:(x)=> x > c1 && x < c2 },
+    { key:'right',label:`Margin (A-B) > ${c2}`, range:(x)=> x > c2 },
+    { key:'pushA', label:`Margin = ${tA.pushAt} (push primary)`, exact:tA.pushAt },
+    { key:'pushB', label:`Margin = ${tB.pushAt} (push live)`, exact:tB.pushAt },
+  ];
+}
+
+function findMiddleWindowText(cfg){
+  if (cfg.market === 'moneyline'){
+    return { text:'No “middle” in ML (only winner)', note:'ML hedge is binary.' };
+  }
+  const regions = regionsForMarket(cfg);
+  // find region(s) where both bets win
+  const matches = [];
+  if (cfg.market === 'spread'){
+    // scan integer margins
+    for (let m=-60; m<=60; m++){
+      const s = settleCombinedForOutcome(cfg, m);
+      if (s.rA === 'win' && s.rB === 'win') matches.push(m);
+    }
+    if (!matches.length) return { text:'No win/win window', note:'Either lines overlap poorly or sides are not opposite.' };
+    const lo = Math.min(...matches), hi = Math.max(...matches);
+    return { text:`${lo} to ${hi} (integer margins)`, note:'Middle is where both bets cash.' };
+  }
+  // totals
+  if (cfg.market === 'total'){
+    const matchesT = [];
+    for (let t=0; t<=200; t++){
+      const s = settleCombinedForOutcome(cfg, t);
+      if (s.rA === 'win' && s.rB === 'win') matchesT.push(t);
+    }
+    if (!matchesT.length) return { text:'No win/win window', note:'Either lines overlap poorly or sides are not opposite.' };
+    const lo = Math.min(...matchesT), hi = Math.max(...matchesT);
+    return { text:`${lo} to ${hi} (integer totals)`, note:'Middle is where both bets cash.' };
+  }
+  return { text:'—', note:'' };
+}
+
+/* ----------------------------- rendering ----------------------------- */
+
+function render(){
+  syncMarketVisibility();
+  if (els.showEV.value === 'no') els.evBox.style.display = 'none';
+  else els.evBox.style.display = '';
+
+  const cfg = currentConfig();
+
+  // sanity
+  if (!isFiniteNumber(cfg.stakeA) || cfg.stakeA < 0) cfg.stakeA = 0;
+  if (!isFiniteNumber(cfg.stakeB) || cfg.stakeB < 0) cfg.stakeB = 0;
+
+  setUnitsHint();
+
+  // region table
+  const regions = regionsForMarket(cfg);
+
+  const regionSummaries = [];
+
+  if (cfg.market === 'moneyline'){
+    for (const r of regions){
+      const s = settleCombinedForOutcome(cfg, r.outcome);
+      regionSummaries.push({
+        region: r.label,
+        primary: s.rA,
+        live: s.rB,
+        profit: s.total,
+        lo: s.totalLo,
+        hi: s.totalHi
+      });
+    }
+  } else {
+    // pick representative points for each region, plus exact points for pushes
+    for (const r of regions){
+      if (Object.prototype.hasOwnProperty.call(r, 'exact')){
+        const s = settleCombinedForOutcome(cfg, r.exact);
+        regionSummaries.push({
+          region: r.label,
+          primary: s.rA,
+          live: s.rB,
+          profit: s.total,
+          lo: s.totalLo,
+          hi: s.totalHi
+        });
+      } else {
+        // choose a point deep in region based on label parsing:
+        let test;
+        if (cfg.market === 'spread'){
+          if (r.key === 'left') test = -50;
+          if (r.key === 'mid') test = 0;
+          if (r.key === 'right') test = 50;
+          // but ensure it actually lands in that region; if not, search
+          let found = null;
+          for (let m=-60; m<=60; m++){
+            if (r.range(m)){ found = m; break; }
+          }
+          if (found === null){
+            for (let m=60; m>=-60; m--){
+              if (r.range(m)){ found = m; break; }
+            }
+          }
+          test = (found === null) ? test : found;
+          const s = settleCombinedForOutcome(cfg, test);
+          regionSummaries.push({ region:r.label, primary:s.rA, live:s.rB, profit:s.total, lo:s.totalLo, hi:s.totalHi });
+        } else {
+          // totals
+          let found = null;
+          for (let t=0; t<=200; t++){
+            if (r.range(t)){ found = t; break; }
+          }
+          const testT = (found === null) ? 0 : found;
+          const s = settleCombinedForOutcome(cfg, testT);
+          regionSummaries.push({ region:r.label, primary:s.rA, live:s.rB, profit:s.total, lo:s.totalLo, hi:s.totalHi });
+        }
+      }
+    }
+  }
+
+  function outcomeTag(x){
+    if (x === 'win') return `<span class="good">WIN</span>`;
+    if (x === 'lose') return `<span class="bad">LOSE</span>`;
+    return `<span class="warn">PUSH</span>`;
+  }
+
+  els.regionRows.innerHTML = regionSummaries.map(r=>{
+    const profitClass = r.profit >= 0 ? 'good' : 'bad';
+    return `
+      <tr>
+        <td>${r.region}</td>
+        <td>${outcomeTag(r.primary)}</td>
+        <td>${outcomeTag(r.live)}</td>
+        <td class="right ${profitClass}">${money(r.profit)}</td>
+        <td class="right mono">${moneyRange(r.lo, r.hi)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // grid table
+  let gridVals = [];
+  if (cfg.market === 'moneyline'){
+    gridVals = ['A','B'];
+  } else {
+    const width = clamp(Number(els.evRange.value)||45, 10, 120);
+    if (cfg.market === 'spread'){
+      for (let m=-width; m<=width; m++){
+        gridVals.push(m);
+      }
+    } else {
+      // totals around mean line; if line is huge, still show centered range
+      const center = isFiniteNumber(cfg.lineA) ? Math.round(cfg.lineA) : 0;
+      for (let t=center-width; t<=center+width; t++){
+        if (t>=0) gridVals.push(t);
+      }
+    }
+  }
+
+  let worst = { v: Infinity, lo: Infinity, hi: Infinity };
+  let best  = { v: -Infinity, lo: -Infinity, hi: -Infinity };
+
+  const rowsHtml = [];
+  for (const x of gridVals){
+    const s = settleCombinedForOutcome(cfg, x);
+    if (s.total < worst.v){ worst = { v:s.total, lo:s.totalLo, hi:s.totalHi }; }
+    if (s.total > best.v){ best = { v:s.total, lo:s.totalLo, hi:s.totalHi }; }
+
+    const profitClass = s.total >= 0 ? 'good' : 'bad';
+    const label =
+      cfg.market === 'spread' ? String(x) :
+      cfg.market === 'total' ? String(x) :
+      (x === 'A' ? cfg.teamA : cfg.teamB);
+
+    rowsHtml.push(`
+      <tr>
+        <td>${label}</td>
+        <td class="right ${profitClass}">${money(s.total)}</td>
+        <td class="right mono">${moneyRange(s.totalLo, s.totalHi)}</td>
+      </tr>
+    `);
+  }
+  els.gridRows.innerHTML = rowsHtml.join('');
+
+  // headline: pick the "middle" (win/win) profit if exists; else show best/worst band
+  let head = best.v;
+  let headLo = best.lo, headHi = best.hi;
+
+  // find a representative "most relevant" value:
+  // - if a win/win exists: use the max win/win profit
+  // - else: use best profit
+  let wwBest = null;
+  if (cfg.market === 'spread'){
+    for (let m=-60; m<=60; m++){
+      const s = settleCombinedForOutcome(cfg, m);
+      if (s.rA === 'win' && s.rB === 'win'){
+        if (!wwBest || s.total > wwBest.v) wwBest = { v:s.total, lo:s.totalLo, hi:s.totalHi };
+      }
+    }
+  } else if (cfg.market === 'total'){
+    for (let t=0; t<=200; t++){
+      const s = settleCombinedForOutcome(cfg, t);
+      if (s.rA === 'win' && s.rB === 'win'){
+        if (!wwBest || s.total > wwBest.v) wwBest = { v:s.total, lo:s.totalLo, hi:s.totalHi };
+      }
+    }
+  }
+  if (wwBest){
+    head = wwBest.v; headLo = wwBest.lo; headHi = wwBest.hi;
+  }
+
+  els.headlineProfit.innerHTML = `${money(head)} <small id="headlineRange">${moneyRange(headLo, headHi)}</small>`;
+
+  // worst/best
+  els.worstCase.textContent = money(worst.v);
+  els.bestCase.textContent = money(best.v);
+  els.worstCaseRange.textContent = moneyRange(worst.lo, worst.hi);
+  els.bestCaseRange.textContent  = moneyRange(best.lo, best.hi);
+
+  // middle window display
+  const mw = findMiddleWindowText(cfg);
+  els.middleWindow.textContent = mw.text;
+  els.middleNote.textContent = mw.note;
+
+  // EV optional
+  if (els.showEV.value === 'no'){
+    els.evOut.textContent = '—';
+    els.evOutNote.textContent = '';
+  } else {
+    const mean = Number(els.evMean.value);
+    const sd = Number(els.evSD.value);
+    const width = clamp(Number(els.evRange.value)||45, 10, 200);
+
+    let ev = NaN;
+    let pMass = 0;
+
+    if (cfg.market === 'moneyline'){
+      // crude: infer win prob from mean (logit) if user sets it; else 50/50.
+      // mean=0 => 50%. mean positive => favors A.
+      const pA = 1/(1+Math.exp(-mean/3));
+      const sA = settleCombinedForOutcome(cfg, 'A').total;
+      const sB = settleCombinedForOutcome(cfg, 'B').total;
+      ev = pA*sA + (1-pA)*sB;
+      pMass = 1;
+      els.evOutNote.textContent = `Assumed P(${cfg.teamA} win) ≈ ${(pA*100).toFixed(1)}% (from mean).`;
+    } else {
+      // approximate by summing integer outcomes with normal weights within ±width
+      const center = Math.round(isFiniteNumber(mean)?mean:0);
+      let sumW = 0, sum = 0;
+      const minX = center - width;
+      const maxX = center + width;
+
+      for (let x=minX; x<=maxX; x++){
+        // probability mass for integer bin [x-0.5, x+0.5]
+        const p = normalProbBetween(x-0.5, x+0.5, mean, sd);
+        if (!isFiniteNumber(p) || p<=0) continue;
+        const s = settleCombinedForOutcome(cfg, x).total;
+        sum += p*s;
+        sumW += p;
+      }
+      ev = sumW>0 ? (sum/sumW) : NaN;
+      pMass = sumW;
+      els.evOutNote.textContent = `Normal approx captured mass ≈ ${(pMass*100).toFixed(1)}% within ±${width}.`;
+    }
+
+    els.evOut.textContent = money(ev);
+  }
+}
+
+/* ----------------------------- event wiring ----------------------------- */
+
+function bind(){
+  const rerender = ()=>{ syncSliderMax(); render(); };
+
+  // market toggles
+  els.market.addEventListener('change', ()=>{
+    syncMarketVisibility();
+    syncEVDefaults();
+    render();
+  });
+
+  els.sport.addEventListener('change', ()=>{
+    syncEVDefaults();
+    render();
+  });
+
+  // keep live stake in sync between slider and input
+  els.stakeSlider.addEventListener('input', ()=>{
+    els.stakeB.value = els.stakeSlider.value;
+    els.stakeBLabel.textContent = '$' + Number(els.stakeSlider.value).toFixed(0);
+    render();
+  });
+
+  els.stakeB.addEventListener('input', ()=>{
+    syncSliderMax();
+    els.stakeBLabel.textContent = '$' + Number(els.stakeB.value || 0).toFixed(0);
+    render();
+  });
+
+  els.sliderMax.addEventListener('input', rerender);
+
+  // general inputs
+  [
+    els.teamA, els.teamB, els.sideA, els.sideB, els.lineA, els.lineB,
+    els.ouA, els.ouB, els.mlA, els.mlB,
+    els.stakeA, els.oddsA, els.oddsB, els.drift, els.unit,
+    els.showEV, els.evMean, els.evSD, els.evRange
+  ].forEach(el=>{
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  // keep ML selectors aligned with side selectors for labeling
+  els.mlA.addEventListener('change', ()=>{
+    els.sideA.value = els.mlA.value;
+    render();
+  });
+  els.mlB.addEventListener('change', ()=>{
+    els.sideB.value = els.mlB.value;
+    render();
+  });
+}
+
+function init(){
+  syncMarketVisibility();
+  syncEVDefaults();
+
+  // default slider max = 5x primary stake
+  const sA = Number(els.stakeA.value);
+  els.sliderMax.value = String(Math.max(100, Math.round((isFiniteNumber(sA)?sA:50) * 5)));
+  syncSliderMax();
+
+  bind();
+  render();
+}
+
+init();
 </script>
-
 </body>
 </html>
