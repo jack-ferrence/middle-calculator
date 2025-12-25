@@ -1,21 +1,22 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Will’s Middling & Hedge Calculator</title>
   <style>
     :root{
-      --bg:#0b0d12;
-      --panel:#121622;
-      --panel2:#0f1320;
-      --text:#e9eefc;
-      --muted:#a9b4d6;
+      --bg:#0b0e16;
+      --panel:#121827;
+      --panel2:#0f1422;
       --line:#253052;
+      --muted:#a8b0c4;
+      --text:#e9ecf5;
       --accent:#7aa2ff;
-      --good:#48d18a;
-      --bad:#ff5c74;
-      --warn:#ffd166;
+      --accent2:#31d0aa;
+      --warn:#ffcc66;
+      --bad:#ff6b6b;
+      --good:#44d18d;
       --shadow: 0 12px 40px rgba(0,0,0,.35);
       --radius: 16px;
     }
@@ -23,63 +24,14 @@
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 20% -10%, rgba(122,162,255,.18), transparent 55%),
-                  radial-gradient(900px 700px at 90% 0%, rgba(72,209,138,.12), transparent 50%),
+      background: radial-gradient(1200px 800px at 10% 10%, rgba(122,162,255,.25), transparent 55%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(49,208,170,.20), transparent 55%),
+                  radial-gradient(900px 600px at 50% 110%, rgba(255,204,102,.15), transparent 60%),
                   var(--bg);
       color:var(--text);
+      overflow-x:hidden;
     }
-
-    /* ===== Decorative images (added) ===== */
-    .topBanner, .bottomBanner{
-      width:100%;
-      display:block;
-      object-fit:cover;
-      max-height: 320px;
-      border-bottom: 1px solid rgba(37,48,82,.8);
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      background: rgba(11,13,18,.65);
-    }
-    .bottomBanner{
-      border-top: 1px solid rgba(37,48,82,.8);
-      border-bottom: none;
-      box-shadow: 0 -18px 60px rgba(0,0,0,.45);
-      max-height: 260px;
-    }
-
-    .sideAd{
-      position: fixed;
-      top: 110px;
-      width: 210px;
-      z-index: 20;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid rgba(37,48,82,.85);
-      background: rgba(11,13,18,.55);
-      box-shadow: 0 20px 70px rgba(0,0,0,.55);
-      transform: translateZ(0);
-      user-select: none;
-      pointer-events: none; /* decoration only; doesn't block clicks */
-    }
-    .sideAd.left{
-      left: 14px;
-      transform: rotate(-2.2deg);
-    }
-    .sideAd.right{
-      right: 14px;
-      transform: rotate(2.2deg);
-    }
-    .sideAd img{
-      display:block;
-      width:100%;
-      height:auto;
-    }
-
-    /* Don’t let side images crowd small screens */
-    @media (max-width: 1240px){
-      .sideAd{display:none;}
-    }
-
-    /* ===== Existing layout ===== */
+    a{color:inherit}
     .wrap{max-width:1100px;margin:28px auto;padding:0 16px 56px}
     header{
       display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px
@@ -89,185 +41,192 @@
     .badge{
       border:1px solid var(--line);
       padding:10px 12px;border-radius:999px;
-      background:rgba(18,22,34,.55);
+      background:rgba(18,24,39,.55);
       box-shadow: var(--shadow);
       font-size:12px;color:var(--muted);
-      line-height:1.2;
-      text-align:right;
       white-space:nowrap;
     }
-
+    .badge b{color:var(--text)}
     .stepper{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:10px;
-      margin:16px 0 18px;
+      display:flex;gap:10px;align-items:center;
+      margin:16px 0 12px;
+      user-select:none;
     }
     .step{
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:rgba(18,22,34,.6);
-      box-shadow: var(--shadow);
-      padding:12px 12px;
-      display:flex;align-items:center;gap:10px;
+      flex:1;
+      border:1px solid rgba(37,48,82,.8);
+      background: rgba(18,24,39,.45);
+      border-radius: 14px;
+      padding:10px 10px;
+      display:flex;gap:10px;align-items:center;
+      cursor:pointer;
+      transition:.15s transform ease, .15s border-color ease, .15s background ease;
+    }
+    .step:hover{transform: translateY(-1px); border-color: rgba(122,162,255,.55)}
+    .step.active{
+      background: linear-gradient(180deg, rgba(122,162,255,.20), rgba(18,24,39,.55));
+      border-color: rgba(122,162,255,.7);
     }
     .step .n{
       width:28px;height:28px;border-radius:10px;
       display:grid;place-items:center;
-      border:1px solid var(--line);
-      color:var(--muted);
-      background:rgba(15,19,32,.65);
-      font-weight:700;
+      background: rgba(15,20,34,.9);
+      border:1px solid rgba(37,48,82,.9);
+      font-weight:800;
+      color: var(--muted);
     }
-    .step.active{border-color:rgba(122,162,255,.55)}
-    .step.active .n{border-color:rgba(122,162,255,.55);color:var(--text)}
-    .step .t{display:flex;flex-direction:column}
-    .step .t b{font-size:13px}
-    .step .t span{font-size:12px;color:var(--muted)}
-
+    .step.active .n{color: var(--text); border-color: rgba(122,162,255,.7)}
+    .step .t{line-height:1.05}
+    .step .t b{display:block;font-size:12px}
+    .step .t span{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+    .panel{
+      border:1px solid rgba(37,48,82,.75);
+      background: rgba(18,24,39,.45);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 14px;
+      margin-top: 10px;
+    }
+    .panelTitle{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px
+    }
+    .panelTitle h2{
+      font-size:14px;margin:0;letter-spacing:.2px
+    }
+    .panelTitle .hint{font-size:12px;color:var(--muted)}
     .grid{
       display:grid;
-      grid-template-columns: 1fr;
-      gap:14px;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
     }
-    .panel{
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(18,22,34,.78), rgba(15,19,32,.72));
-      box-shadow: var(--shadow);
-      overflow:hidden;
+    @media (max-width: 820px){
+      .grid{grid-template-columns:1fr}
+      header{flex-direction:column;align-items:flex-start}
+      .badge{align-self:flex-start}
+      .stepper{flex-direction:column}
+      .step{width:100%}
     }
-    .panelHeader{
-      padding:14px 16px;
-      border-bottom:1px solid rgba(37,48,82,.8);
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      background: rgba(15,19,32,.45);
-    }
-    .panelHeader .left{
-      display:flex;align-items:baseline;gap:10px;flex-wrap:wrap
-    }
-    .panelHeader .k{
-      font-size:12px;color:var(--muted);border:1px solid var(--line);
-      padding:6px 10px;border-radius:999px;background:rgba(18,22,34,.35)
-    }
-    .panelHeader h2{margin:0;font-size:15px}
-    .panelBody{padding:14px 16px 16px}
-
-    .row{display:grid;grid-template-columns: repeat(12, 1fr);gap:10px;margin-bottom:10px}
-    .field{grid-column: span 6}
-    .field.small{grid-column: span 3}
-    .field.tiny{grid-column: span 2}
+    .row{display:flex;gap:10px;align-items:center}
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     input, select{
       width:100%;
       padding:10px 10px;
-      border-radius:12px;
-      border:1px solid rgba(37,48,82,.85);
-      background: rgba(11,13,18,.65);
+      border-radius: 12px;
+      border: 1px solid rgba(37,48,82,.9);
+      background: rgba(15,19,32,.8);
       color: var(--text);
       outline:none;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.0);
     }
-    input:focus, select:focus{border-color:rgba(122,162,255,.7)}
-    .help{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
-    .divider{height:1px;background:rgba(37,48,82,.7);margin:12px 0}
-    .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    button{
-      border:1px solid rgba(37,48,82,.85);
-      background: rgba(18,22,34,.5);
-      color: var(--text);
-      padding:10px 12px;border-radius:12px;
+    input:focus, select:focus{
+      border-color: rgba(122,162,255,.8);
+      box-shadow: 0 0 0 3px rgba(122,162,255,.15);
+    }
+    .pillRow{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{
+      padding:8px 10px;border-radius:999px;
+      border:1px solid rgba(37,48,82,.9);
+      background: rgba(15,19,32,.75);
+      font-size:12px;color:var(--muted);
       cursor:pointer;
+      transition:.15s border-color ease, .15s background ease, .15s transform ease;
     }
+    .pill:hover{transform: translateY(-1px); border-color: rgba(122,162,255,.55)}
+    .pill.active{
+      color: var(--text);
+      background: rgba(122,162,255,.18);
+      border-color: rgba(122,162,255,.75);
+    }
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    button{
+      border:1px solid rgba(37,48,82,.9);
+      background: rgba(15,19,32,.8);
+      color: var(--text);
+      padding:10px 12px;border-radius: 12px;
+      cursor:pointer;
+      transition:.15s transform ease, .15s border-color ease, .15s background ease;
+      font-weight:700;
+    }
+    button:hover{transform: translateY(-1px); border-color: rgba(122,162,255,.55)}
     button.primary{
-      border-color:rgba(122,162,255,.65);
-      background: rgba(122,162,255,.12);
+      background: linear-gradient(180deg, rgba(122,162,255,.28), rgba(15,19,32,.75));
+      border-color: rgba(122,162,255,.75);
     }
-    button:active{transform: translateY(1px)}
-    .note{
-      padding:10px 12px;border-radius:12px;
-      border:1px solid rgba(37,48,82,.85);
+    button.good{
+      background: linear-gradient(180deg, rgba(68,209,141,.20), rgba(15,19,32,.78));
+      border-color: rgba(68,209,141,.65);
+    }
+    .small{font-size:12px;color:var(--muted)}
+    .sep{height:1px;background: rgba(37,48,82,.6);margin:12px 0}
+    .kpiGrid{display:grid;grid-template-columns: 1fr 1fr 1fr;gap:10px;margin-top:12px}
+    @media (max-width: 820px){.kpiGrid{grid-template-columns:1fr}}
+    .kpi{
+      border:1px solid rgba(37,48,82,.75);
       background: rgba(15,19,32,.55);
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.4;
+      border-radius: 14px;
+      padding: 10px 12px;
     }
-
-    .resultsTop{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:12px;
-      align-items:stretch;
+    .kpi h3{margin:0 0 6px;font-size:12px;color:var(--muted);font-weight:600}
+    .kpi .v{font-size:20px;font-weight:800;letter-spacing:.2px}
+    .kpi .subv{font-size:12px;color:var(--muted);margin-top:2px}
+    .big{
+      font-size:32px;font-weight:900;letter-spacing:.3px;margin:0
     }
-    @media (max-width: 900px){
-      .resultsTop{grid-template-columns:1fr}
-      .field.small,.field.tiny,.field{grid-column: span 12}
-      .stepper{grid-template-columns:1fr;gap:8px}
-    }
-
-    .bigBox{
-      border:1px solid rgba(37,48,82,.9);
-      background: rgba(11,13,18,.55);
-      border-radius:16px;
-      padding:14px 14px;
-      box-shadow: var(--shadow);
-    }
-    .bigTitle{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .bigTitle h3{margin:0;font-size:14px;color:var(--muted);font-weight:600}
-    .bigTitle .right{font-size:12px;color:var(--muted);text-align:right}
-    .bigNum{
-      font-size:34px;
-      margin:10px 0 0;
-      letter-spacing:.2px;
-      font-weight:800;
-    }
-    .bigSub{margin:6px 0 0;font-size:12px;color:var(--muted)}
-    .pos{color:var(--good)}
-    .neg{color:var(--bad)}
-    .mid{color:var(--warn)}
-
-    .tableWrap{
-      border:1px solid rgba(37,48,82,.9);
-      background: rgba(11,13,18,.42);
-      border-radius:16px;
+    .bigSub{margin:0;color:var(--muted);font-size:12px}
+    .goodTxt{color:var(--good)}
+    .badTxt{color:var(--bad)}
+    .warnTxt{color:var(--warn)}
+    .table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
       overflow:hidden;
+      border-radius: 14px;
+      border:1px solid rgba(37,48,82,.75);
+      margin-top:10px;
+      background: rgba(15,19,32,.45);
     }
-    table{width:100%;border-collapse:collapse;font-size:13px}
-    thead th{
-      text-align:left;
-      padding:10px 12px;
-      background: rgba(15,19,32,.7);
-      border-bottom:1px solid rgba(37,48,82,.9);
-      color: var(--muted);
-      font-weight:600;
-    }
-    tbody td{
-      padding:10px 12px;
+    .table th, .table td{
+      padding:10px 10px;
       border-bottom:1px solid rgba(37,48,82,.55);
+      font-size:12px;
       vertical-align:top;
     }
-    tbody tr:last-child td{border-bottom:none}
-    .pill{
-      display:inline-block;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid rgba(37,48,82,.85);
-      color:var(--muted);
+    .table th{
+      text-align:left;
+      color: var(--muted);
+      font-weight:700;
+      background: rgba(18,24,39,.55);
+    }
+    .table tr:last-child td{border-bottom:none}
+    .mono{font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;}
+    .range{
+      font-size:12px;color:var(--muted);margin-top:3px
+    }
+    .sliderWrap{
+      border:1px solid rgba(37,48,82,.75);
+      background: rgba(15,19,32,.45);
+      border-radius: 14px;
+      padding: 12px 12px;
+      margin-top:10px;
+    }
+    .sliderHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .sliderHeader b{font-size:12px}
+    input[type="range"]{padding:0; border:none; background:transparent}
+    .note{
+      margin-top:10px;
+      color: var(--muted);
       font-size:12px;
-      background: rgba(18,22,34,.35);
+      line-height:1.35;
     }
-    .mono{font-variant-numeric: tabular-nums; font-feature-settings:"tnum" 1}
-    .muted{color:var(--muted)}
-    .warnText{color:var(--warn)}
-    .goodText{color:var(--good)}
-    .badText{color:var(--bad)}
-
-    .sliderBox{
-      border:1px solid rgba(37,48,82,.9);
-      background: rgba(11,13,18,.42);
-      border-radius:16px;
-      padding:14px 14px;
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(37,48,82,.85);
+      background: rgba(15,19,32,.55);
+      font-size:12px;color:var(--muted);
     }
-    input[type="range"]{width:100%}
+    .chip b{color:var(--text)}
     .miniGrid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -284,18 +243,71 @@
     .mini .v{font-size:18px;font-weight:800}
     .footerNote{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.35}
     .hidden{display:none}
+
+    /* --- Gift photo decorations (non-destructive) --- */
+    .giftTop, .giftBottom{
+      width: min(1100px, 100%);
+      margin: 18px auto;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    .giftTop img, .giftBottom img{
+      display:block;
+      width:100%;
+      height:auto;
+      object-fit:contain;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.15);
+    }
+
+    /* Side "popup ad" style, but never crop the image */
+    .sideAd{
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 999;
+      width: 220px;
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(10,12,22,.72);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .sideAd.left{ left: 10px; }
+    .sideAd.right{ right: 10px; }
+    .sideAd img{
+      display:block;
+      width:100%;
+      height:auto;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+    @media (max-width: 1200px){
+      .sideAd{ display:none; }
+    }
+    @media (min-width: 1201px){
+      body{ padding-left: 250px; padding-right: 250px; }
+      .wrap{ margin: 28px auto; }
+    }
+
   </style>
 </head>
 <body>
-  <!-- Decorative top banner (added) -->
-  <img class="topBanner" src="top photo.png" alt="Top banner" />
+  <!-- Gift photo decorations -->
+  <div class="giftTop">
+    <img src="top%20photo.png" alt="Will’s Middling & Hedging Calculator - Top Banner" loading="eager" decoding="async"/>
+  </div>
 
-  <!-- Decorative side “pop-up ad” style images (added) -->
   <div class="sideAd left" aria-hidden="true">
-    <img src="photo 1.png" alt="" />
+    <img src="photo%201.png" alt="Gift photo left" loading="lazy" decoding="async"/>
   </div>
   <div class="sideAd right" aria-hidden="true">
-    <img src="photo 2.png" alt="" />
+    <img src="photo%202.png" alt="Gift photo right" loading="lazy" decoding="async"/>
   </div>
 
   <div class="wrap">
@@ -321,918 +333,830 @@
       </div>
       <div class="step" data-step="3">
         <div class="n">3</div>
-        <div class="t"><b>Live</b><span>Middle / hedge</span></div>
+        <div class="t"><b>Live</b><span>Hedge/middle bet</span></div>
       </div>
       <div class="step" data-step="4">
         <div class="n">4</div>
-        <div class="t"><b>Results</b><span>Slider + payouts</span></div>
+        <div class="t"><b>Results</b><span>Payouts + ranges</span></div>
       </div>
     </div>
 
-    <div class="grid">
-      <!-- Panel 1 -->
-      <section class="panel" id="panel1">
-        <div class="panelHeader">
-          <div class="left">
-            <span class="k">Panel 1</span>
-            <h2>Setup (league + teams)</h2>
+    <!-- PANEL 1 -->
+    <section class="panel" id="panel1">
+      <div class="panelTitle">
+        <h2>1) Setup</h2>
+        <div class="hint">Pick league, teams, and bet type.</div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>League</label>
+          <select id="league">
+            <option value="NFL">NFL (football)</option>
+            <option value="NBA">NBA (basketball)</option>
+          </select>
+          <div class="note">Team dropdowns include every team in the selected league. Defaults are Team A / Team B.</div>
+        </div>
+
+        <div>
+          <label>Bet type</label>
+          <div class="pillRow" id="betTypeRow">
+            <div class="pill active" data-type="spread">Spread</div>
+            <div class="pill" data-type="total">Total (O/U)</div>
+            <div class="pill" data-type="ml">Moneyline</div>
+            <div class="pill" data-type="prop">Prop (O/U)</div>
           </div>
-          <div class="btnRow">
-            <button class="primary" id="to2a">Go to Panel 2 →</button>
+          <div class="note">Neutral calculator. Uses American odds and standard payout math.</div>
+        </div>
+
+        <div>
+          <label>Team A</label>
+          <select id="teamA"></select>
+        </div>
+
+        <div>
+          <label>Team B</label>
+          <select id="teamB"></select>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button class="primary" id="to2">Next → Panel 2</button>
+        <span class="small">Move left-to-right: 1 → 2 → 3 → 4</span>
+      </div>
+    </section>
+
+    <!-- PANEL 2 -->
+    <section class="panel hidden" id="panel2">
+      <div class="panelTitle">
+        <h2>2) Pregame bet (original)</h2>
+        <div class="hint">Enter the bet you already have.</div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>Side (what you bet)</label>
+          <select id="preSide">
+            <option value="A">Team A</option>
+            <option value="B">Team B</option>
+            <option value="over">Over</option>
+            <option value="under">Under</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Line / number</label>
+          <input id="preLine" type="number" step="0.5" value="-3.5"/>
+          <div class="note" id="preLineHint">Examples: -3.5 (spread) • 45.5 (total) • 1.5 (prop) • leave blank for ML</div>
+        </div>
+
+        <div>
+          <label>Stake ($)</label>
+          <input id="preStake" type="number" step="1" value="20"/>
+        </div>
+
+        <div>
+          <label>Odds (American)</label>
+          <input id="preOdds" type="number" step="1" value="-110"/>
+          <div class="note">Examples: -110, +120, -135</div>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button id="back1">← Back to Panel 1</button>
+        <button class="primary" id="to3">Next → Panel 3</button>
+      </div>
+    </section>
+
+    <!-- PANEL 3 -->
+    <section class="panel hidden" id="panel3">
+      <div class="panelTitle">
+        <h2>3) Live hedge / middle bet</h2>
+        <div class="hint">Enter the live bet opportunity.</div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>Live side (what you’d bet now)</label>
+          <select id="liveSide">
+            <option value="B">Team B</option>
+            <option value="A">Team A</option>
+            <option value="over">Over</option>
+            <option value="under">Under</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Live line / number</label>
+          <input id="liveLine" type="number" step="0.5" value="7.5"/>
+          <div class="note" id="liveLineHint">Example: +7.5 (spread) • 52.5 (total) • 3.5 (prop) • leave blank for ML</div>
+        </div>
+
+        <div>
+          <label>Live odds (American)</label>
+          <input id="liveOdds" type="number" step="1" value="-110"/>
+          <div class="note">We assume a ±15 drift range for live odds in the outputs.</div>
+        </div>
+
+        <div>
+          <label>Max live stake slider ($)</label>
+          <input id="liveStakeMax" type="number" step="1" value="200"/>
+          <div class="note">Slider lets Will quickly see payout changes as stake changes.</div>
+        </div>
+      </div>
+
+      <div class="sliderWrap">
+        <div class="sliderHeader">
+          <b>Live stake (use slider)</b>
+          <span class="chip">Stake: <b class="mono" id="liveStakeLabel">$20</b></span>
+        </div>
+        <input id="liveStake" type="range" min="0" max="200" value="20" step="1"/>
+        <div class="small">Tip: set max stake to the biggest hedge he’d actually consider.</div>
+      </div>
+
+      <div class="btnRow">
+        <button id="back2">← Back to Panel 2</button>
+        <button class="good" id="to4">Compute → Panel 4</button>
+      </div>
+    </section>
+
+    <!-- PANEL 4 -->
+    <section class="panel hidden" id="panel4">
+      <div class="panelTitle">
+        <h2>4) Results</h2>
+        <div class="hint">Clear payouts for each outcome, with odds drift ranges.</div>
+      </div>
+
+      <div class="kpiGrid">
+        <div class="kpi">
+          <h3>If you do nothing (pregame bet only)</h3>
+          <div class="v mono" id="kpiDoNothing">$0.00</div>
+          <div class="subv" id="kpiDoNothingRange">(range: $0.00 to $0.00)</div>
+        </div>
+        <div class="kpi">
+          <h3>Best-case (middle hits)</h3>
+          <div class="v mono goodTxt" id="kpiBest">$0.00</div>
+          <div class="subv" id="kpiBestRange">(range: $0.00 to $0.00)</div>
+        </div>
+        <div class="kpi">
+          <h3>Worst-case (both lose possible)</h3>
+          <div class="v mono badTxt" id="kpiWorst">$0.00</div>
+          <div class="subv" id="kpiWorstRange">(range: $0.00 to $0.00)</div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="grid">
+        <div>
+          <p class="big mono" id="headline">$0.00</p>
+          <p class="bigSub" id="headlineSub">(with odds drift range in parentheses)</p>
+
+          <div class="miniGrid">
+            <div class="mini">
+              <h4>Pregame bet profit if it wins</h4>
+              <div class="v mono" id="preWinProfit">$0.00</div>
+            </div>
+            <div class="mini">
+              <h4>Live bet profit if it wins</h4>
+              <div class="v mono" id="liveWinProfit">$0.00</div>
+              <div class="range" id="liveWinProfitRange">(range: $0.00 to $0.00)</div>
+            </div>
+          </div>
+
+          <div class="note" id="middleNote"></div>
+        </div>
+
+        <div>
+          <table class="table" id="outTable">
+            <thead>
+              <tr>
+                <th>Outcome bucket</th>
+                <th>What happens</th>
+                <th>P&L (exact)</th>
+                <th>P&L range (±15 odds)</th>
+              </tr>
+            </thead>
+            <tbody id="outBody"></tbody>
+          </table>
+
+          <div class="footerNote">
+            Odds drift range: assumes live odds can move within ±15. Pregame odds are treated as locked.
           </div>
         </div>
-        <div class="panelBody">
-          <div class="row">
-            <div class="field small">
-              <label for="league">League</label>
-              <select id="league">
-                <option value="NFL">NFL</option>
-                <option value="NBA">NBA</option>
-              </select>
-              <div class="help">Team dropdowns load the full league list. Defaults stay “Team A / Team B” if you don’t pick.</div>
-            </div>
-            <div class="field">
-              <label for="teamA">Team A</label>
-              <select id="teamA"></select>
-            </div>
-            <div class="field">
-              <label for="teamB">Team B</label>
-              <select id="teamB"></select>
-            </div>
-          </div>
+      </div>
 
-          <div class="note">
-            Middle logic assumes the two bets are on opposite sides (ex: A -3.5 pregame, B +7.5 live; or Over 45.5 pregame, Under 52.5 live).
-            Moneyline has no true “middle” range; it’s a hedge outcome split.
-          </div>
-        </div>
-      </section>
+      <div class="btnRow">
+        <button id="back3">← Back to Panel 3</button>
+        <button class="primary" id="copySummary">Copy summary</button>
+        <span class="small" id="copyMsg"></span>
+      </div>
+    </section>
 
-      <!-- Panel 2 -->
-      <section class="panel" id="panel2">
-        <div class="panelHeader">
-          <div class="left">
-            <span class="k">Panel 2</span>
-            <h2>Pregame bet (original)</h2>
-          </div>
-          <div class="btnRow">
-            <button id="back1a">← Back to Panel 1</button>
-            <button class="primary" id="to3a">Go to Panel 3 →</button>
-          </div>
-        </div>
-        <div class="panelBody">
-          <div class="row">
-            <div class="field small">
-              <label for="betType">Bet type</label>
-              <select id="betType">
-                <option value="SPREAD">Spread</option>
-                <option value="TOTAL">Total (O/U)</option>
-                <option value="ML">Moneyline</option>
-              </select>
-            </div>
-
-            <div class="field small" id="pregameSideWrap">
-              <label for="pregameSide">Pregame side</label>
-              <select id="pregameSide">
-                <option value="A">Team A</option>
-                <option value="B">Team B</option>
-                <option value="OVER">Over</option>
-                <option value="UNDER">Under</option>
-              </select>
-            </div>
-
-            <div class="field small" id="pregameLineWrap">
-              <label for="pregameLine">Pregame line</label>
-              <input id="pregameLine" type="number" step="0.5" value="-3.5" />
-              <div class="help">Spread example: -3.5. Total example: 45.5. Moneyline: ignored.</div>
-            </div>
-
-            <div class="field small">
-              <label for="pregameOdds">Pregame odds (American)</label>
-              <input id="pregameOdds" type="number" step="1" value="-110" />
-            </div>
-
-            <div class="field small">
-              <label for="pregameStake">Pregame stake ($)</label>
-              <input id="pregameStake" type="number" step="1" value="20" />
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="note">
-            Interpretation:
-            <span class="pill">Spread</span> pregame side is Team A or Team B with a line.
-            <span class="pill">Total</span> pregame side is Over or Under with a total.
-            <span class="pill">Moneyline</span> pregame side is Team A or Team B; line is ignored.
-          </div>
-        </div>
-      </section>
-
-      <!-- Panel 3 -->
-      <section class="panel" id="panel3">
-        <div class="panelHeader">
-          <div class="left">
-            <span class="k">Panel 3</span>
-            <h2>Live bet (middle / hedge leg)</h2>
-          </div>
-          <div class="btnRow">
-            <button id="back2a">← Back to Panel 2</button>
-            <button class="primary" id="to4a">Go to Panel 4 →</button>
-          </div>
-        </div>
-        <div class="panelBody">
-          <div class="row">
-            <div class="field small" id="liveSideWrap">
-              <label for="liveSide">Live side</label>
-              <select id="liveSide">
-                <option value="A">Team A</option>
-                <option value="B">Team B</option>
-                <option value="OVER">Over</option>
-                <option value="UNDER">Under</option>
-              </select>
-            </div>
-
-            <div class="field small" id="liveLineWrap">
-              <label for="liveLine">Live line</label>
-              <input id="liveLine" type="number" step="0.5" value="7.5" />
-            </div>
-
-            <div class="field small">
-              <label for="liveOdds">Live odds (American)</label>
-              <input id="liveOdds" type="number" step="1" value="-110" />
-              <div class="help">Displayed payout also shows a ±15 odds drift range.</div>
-            </div>
-
-            <div class="field small">
-              <label for="liveStake">Live stake default ($)</label>
-              <input id="liveStake" type="number" step="1" value="20" />
-              <div class="help">This sets the slider’s starting value.</div>
-            </div>
-
-            <div class="field small">
-              <label for="sliderMax">Slider max ($)</label>
-              <input id="sliderMax" type="number" step="10" value="300" />
-            </div>
-          </div>
-
-          <div class="note">
-            For a “classic middle” in spreads/totals you need a gap:
-            pregame side wins on one side of the gap, live side wins on the other side, and the middle zone is where both win.
-          </div>
-        </div>
-      </section>
-
-      <!-- Panel 4 -->
-      <section class="panel" id="panel4">
-        <div class="panelHeader">
-          <div class="left">
-            <span class="k">Panel 4</span>
-            <h2>Results (slider + payout layout)</h2>
-          </div>
-          <div class="btnRow">
-            <button id="back3a">← Back to Panel 3</button>
-            <button id="reset">Reset to defaults</button>
-          </div>
-        </div>
-        <div class="panelBody">
-
-          <div class="resultsTop">
-            <div class="bigBox">
-              <div class="bigTitle">
-                <div>
-                  <h3>Headline: Net profit for selected outcome</h3>
-                  <div class="bigSub muted" id="headlineContext">Move the live stake slider. Tables update live.</div>
-                </div>
-                <div class="right">
-                  <div class="pill" id="teamsLabel">Team A vs Team B</div><br/>
-                  <span class="mono muted" id="betSummary">—</span>
-                </div>
-              </div>
-              <div class="bigNum mono" id="headlineNet">$0.00</div>
-              <div class="bigSub" id="headlineRange">(range: $0.00 to $0.00 if live odds drift ±15)</div>
-            </div>
-
-            <div class="sliderBox">
-              <label for="stakeSlider">Live stake ($)</label>
-              <input id="stakeSlider" type="range" min="0" max="300" step="1" value="20" />
-              <div class="miniGrid">
-                <div class="mini">
-                  <h4>Live stake</h4>
-                  <div class="v mono" id="liveStakeRead">$20</div>
-                  <div class="help">Adjusting this is the whole point: find the stake that makes the middle/hedge worth it.</div>
-                </div>
-                <div class="mini">
-                  <h4>Middle size (if any)</h4>
-                  <div class="v mono" id="middleSize">—</div>
-                  <div class="help">Spread: winning margin integers. Total: total-points integers.</div>
-                </div>
-              </div>
-              <div class="footerNote" id="noMiddleNote"></div>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="tableWrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Outcome bucket</th>
-                  <th>What happens</th>
-                  <th>Net profit (entered live odds)</th>
-                  <th>Net profit range (live odds ±15)</th>
-                </tr>
-              </thead>
-              <tbody id="bucketRows"></tbody>
-            </table>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="tableWrap" id="middleTableWrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Middle zone detail</th>
-                  <th>Exact results that “double-win”</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="muted">If there is a middle, this lists the integers inside the gap.</td>
-                  <td class="mono" id="middleDetail">—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-      </section>
-
-    </div>
   </div>
 
-  <!-- Decorative bottom banner (added) -->
-  <img class="bottomBanner" src="bottom photo.png" alt="Bottom banner" />
+  <script>
+    // -------------------------
+    // Data: Team lists
+    // -------------------------
+    const TEAMS = {
+      NFL: [
+        "Team A","Team B",
+        "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills","Carolina Panthers","Chicago Bears",
+        "Cincinnati Bengals","Cleveland Browns","Dallas Cowboys","Denver Broncos","Detroit Lions","Green Bay Packers",
+        "Houston Texans","Indianapolis Colts","Jacksonville Jaguars","Kansas City Chiefs","Las Vegas Raiders",
+        "Los Angeles Chargers","Los Angeles Rams","Miami Dolphins","Minnesota Vikings","New England Patriots",
+        "New Orleans Saints","New York Giants","New York Jets","Philadelphia Eagles","Pittsburgh Steelers",
+        "San Francisco 49ers","Seattle Seahawks","Tampa Bay Buccaneers","Tennessee Titans","Washington Commanders"
+      ],
+      NBA: [
+        "Team A","Team B",
+        "Atlanta Hawks","Boston Celtics","Brooklyn Nets","Charlotte Hornets","Chicago Bulls","Cleveland Cavaliers",
+        "Dallas Mavericks","Denver Nuggets","Detroit Pistons","Golden State Warriors","Houston Rockets","Indiana Pacers",
+        "LA Clippers","Los Angeles Lakers","Memphis Grizzlies","Miami Heat","Milwaukee Bucks","Minnesota Timberwolves",
+        "New Orleans Pelicans","New York Knicks","Oklahoma City Thunder","Orlando Magic","Philadelphia 76ers",
+        "Phoenix Suns","Portland Trail Blazers","Sacramento Kings","San Antonio Spurs","Toronto Raptors","Utah Jazz",
+        "Washington Wizards"
+      ]
+    };
 
-<script>
-/* =========================
-   League data
-========================= */
-const LEAGUES = {
-  NFL: [
-    "Arizona Cardinals","Atlanta Falcons","Baltimore Ravens","Buffalo Bills","Carolina Panthers","Chicago Bears",
-    "Cincinnati Bengals","Cleveland Browns","Dallas Cowboys","Denver Broncos","Detroit Lions","Green Bay Packers",
-    "Houston Texans","Indianapolis Colts","Jacksonville Jaguars","Kansas City Chiefs","Las Vegas Raiders","Los Angeles Chargers",
-    "Los Angeles Rams","Miami Dolphins","Minnesota Vikings","New England Patriots","New Orleans Saints","New York Giants",
-    "New York Jets","Philadelphia Eagles","Pittsburgh Steelers","San Francisco 49ers","Seattle Seahawks","Tampa Bay Buccaneers",
-    "Tennessee Titans","Washington Commanders"
-  ],
-  NBA: [
-    "Atlanta Hawks","Boston Celtics","Brooklyn Nets","Charlotte Hornets","Chicago Bulls","Cleveland Cavaliers",
-    "Dallas Mavericks","Denver Nuggets","Detroit Pistons","Golden State Warriors","Houston Rockets","Indiana Pacers",
-    "LA Clippers","Los Angeles Lakers","Memphis Grizzlies","Miami Heat","Milwaukee Bucks","Minnesota Timberwolves",
-    "New Orleans Pelicans","New York Knicks","Oklahoma City Thunder","Orlando Magic","Philadelphia 76ers","Phoenix Suns",
-    "Portland Trail Blazers","Sacramento Kings","San Antonio Spurs","Toronto Raptors","Utah Jazz","Washington Wizards"
-  ]
-};
+    // -------------------------
+    // State
+    // -------------------------
+    let state = {
+      betType: "spread",
+      league: "NFL",
+      teamA: "Team A",
+      teamB: "Team B",
+      pre: { side:"A", line:-3.5, stake:20, odds:-110 },
+      live: { side:"B", line:7.5, odds:-110, stake:20, max:200 },
+      drift: 15
+    };
 
-/* =========================
-   Helpers: formatting + odds math
-========================= */
-const fmtMoney = (n) => {
-  const v = Number.isFinite(n) ? n : 0;
-  const sign = v < 0 ? "-" : "";
-  const abs = Math.abs(v);
-  return `${sign}$${abs.toFixed(2)}`;
-};
-const clamp = (x,min,max) => Math.max(min, Math.min(max, x));
+    const $ = (id) => document.getElementById(id);
 
-function americanProfit(stake, odds){
-  stake = Number(stake) || 0;
-  odds = Number(odds) || 0;
-  if (odds === 0) return 0;
-  if (odds > 0) return stake * (odds/100);
-  return stake * (100/Math.abs(odds));
-}
-function americanPayoutTotal(stake, odds){
-  return stake + americanProfit(stake, odds);
-}
-function driftOddsRange(odds){
-  const o = Number(odds) || 0;
-  if (o === 0) return {min:0,max:0};
-  const min = o - 15;
-  const max = o + 15;
-  return {min, max};
-}
-function profitRangeForWin(stake, odds){
-  const r = driftOddsRange(odds);
-  const p1 = americanProfit(stake, r.min);
-  const p2 = americanProfit(stake, r.max);
-  return {min: Math.min(p1,p2), max: Math.max(p1,p2), oddsMin:r.min, oddsMax:r.max};
-}
-
-/* =========================
-   Bet resolution logic
-========================= */
-function resolveSpread(side, line, margin){
-  // margin = TeamA score - TeamB score
-  // side: "A" or "B"
-  line = Number(line);
-  margin = Number(margin);
-  if (!Number.isFinite(line) || !Number.isFinite(margin)) return "LOSE";
-
-  if (side === "A"){
-    const adj = margin + line; // if line is -3.5, needs margin -3.5? Actually A -3.5 means margin-3.5 > 0 => margin > 3.5
-    if (adj > 0) return "WIN";
-    if (adj === 0) return "PUSH";
-    return "LOSE";
-  } else {
-    // B line is typically positive if B is dog. Equivalent: (-margin) + line > 0
-    const adj = (-margin) + line;
-    if (adj > 0) return "WIN";
-    if (adj === 0) return "PUSH";
-    return "LOSE";
-  }
-}
-function resolveTotal(side, line, totalPoints){
-  line = Number(line);
-  totalPoints = Number(totalPoints);
-  if (!Number.isFinite(line) || !Number.isFinite(totalPoints)) return "LOSE";
-
-  if (side === "OVER"){
-    if (totalPoints > line) return "WIN";
-    if (totalPoints === line) return "PUSH";
-    return "LOSE";
-  } else {
-    if (totalPoints < line) return "WIN";
-    if (totalPoints === line) return "PUSH";
-    return "LOSE";
-  }
-}
-function resolveML(side, winner){
-  // winner: "A" or "B"
-  return (side === winner) ? "WIN" : "LOSE";
-}
-
-function betWinProfit(stake, odds){
-  return americanProfit(stake, odds);
-}
-
-/* =========================
-   UI state + wiring
-========================= */
-const els = {
-  league: document.getElementById("league"),
-  teamA: document.getElementById("teamA"),
-  teamB: document.getElementById("teamB"),
-
-  betType: document.getElementById("betType"),
-  pregameSide: document.getElementById("pregameSide"),
-  pregameLine: document.getElementById("pregameLine"),
-  pregameOdds: document.getElementById("pregameOdds"),
-  pregameStake: document.getElementById("pregameStake"),
-
-  liveSide: document.getElementById("liveSide"),
-  liveLine: document.getElementById("liveLine"),
-  liveOdds: document.getElementById("liveOdds"),
-  liveStake: document.getElementById("liveStake"),
-  sliderMax: document.getElementById("sliderMax"),
-
-  stakeSlider: document.getElementById("stakeSlider"),
-  liveStakeRead: document.getElementById("liveStakeRead"),
-
-  teamsLabel: document.getElementById("teamsLabel"),
-  betSummary: document.getElementById("betSummary"),
-
-  headlineNet: document.getElementById("headlineNet"),
-  headlineRange: document.getElementById("headlineRange"),
-  headlineContext: document.getElementById("headlineContext"),
-
-  bucketRows: document.getElementById("bucketRows"),
-  middleSize: document.getElementById("middleSize"),
-  noMiddleNote: document.getElementById("noMiddleNote"),
-  middleDetail: document.getElementById("middleDetail"),
-  middleTableWrap: document.getElementById("middleTableWrap"),
-
-  pregameSideWrap: document.getElementById("pregameSideWrap"),
-  pregameLineWrap: document.getElementById("pregameLineWrap"),
-  liveSideWrap: document.getElementById("liveSideWrap"),
-  liveLineWrap: document.getElementById("liveLineWrap"),
-
-  // nav buttons
-  to2a: document.getElementById("to2a"),
-  to3a: document.getElementById("to3a"),
-  to4a: document.getElementById("to4a"),
-  back1a: document.getElementById("back1a"),
-  back2a: document.getElementById("back2a"),
-  back3a: document.getElementById("back3a"),
-  reset: document.getElementById("reset"),
-
-  panel1: document.getElementById("panel1"),
-  panel2: document.getElementById("panel2"),
-  panel3: document.getElementById("panel3"),
-  panel4: document.getElementById("panel4"),
-  stepper: document.getElementById("stepper"),
-};
-
-function setStepper(active){
-  [...els.stepper.querySelectorAll(".step")].forEach(s=>{
-    s.classList.toggle("active", Number(s.dataset.step) === active);
-  });
-}
-function scrollToPanel(panelEl){
-  panelEl.scrollIntoView({behavior:"smooth", block:"start"});
-}
-
-function populateTeams(){
-  const league = els.league.value;
-  const list = LEAGUES[league] || [];
-  const makeOptions = (selectEl, defaultLabel) => {
-    selectEl.innerHTML = "";
-    const opt0 = document.createElement("option");
-    opt0.value = defaultLabel;
-    opt0.textContent = defaultLabel;
-    selectEl.appendChild(opt0);
-    list.forEach(name=>{
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      selectEl.appendChild(opt);
-    });
-  };
-  makeOptions(els.teamA, "Team A");
-  makeOptions(els.teamB, "Team B");
-  updateLabels();
-}
-
-function updateLabels(){
-  const a = els.teamA.value || "Team A";
-  const b = els.teamB.value || "Team B";
-  els.teamsLabel.textContent = `${a} vs ${b}`;
-  updateSideSelectors();
-  updateAll();
-}
-
-function updateSideSelectors(){
-  const type = els.betType.value;
-  const a = els.teamA.value || "Team A";
-  const b = els.teamB.value || "Team B";
-
-  // rebuild side options to show names while preserving values
-  const setSelect = (sel, items) => {
-    const cur = sel.value;
-    sel.innerHTML = "";
-    items.forEach(([val,label])=>{
-      const o = document.createElement("option");
-      o.value = val;
-      o.textContent = label;
-      sel.appendChild(o);
-    });
-    // best effort restore
-    const canRestore = [...sel.options].some(o=>o.value===cur);
-    if (canRestore) sel.value = cur;
-  };
-
-  if (type === "SPREAD" || type === "ML"){
-    setSelect(els.pregameSide, [["A",a],["B",b]]);
-    setSelect(els.liveSide, [["A",a],["B",b]]);
-  } else {
-    setSelect(els.pregameSide, [["OVER","Over"],["UNDER","Under"]]);
-    setSelect(els.liveSide, [["OVER","Over"],["UNDER","Under"]]);
-  }
-
-  // show/hide line boxes
-  const showLine = (type === "SPREAD" || type === "TOTAL");
-  els.pregameLineWrap.classList.toggle("hidden", !showLine);
-  els.liveLineWrap.classList.toggle("hidden", !showLine);
-}
-
-function resetDefaults(){
-  els.league.value = "NFL";
-  populateTeams();
-
-  els.betType.value = "SPREAD";
-  els.pregameLine.value = -3.5;
-  els.pregameOdds.value = -110;
-  els.pregameStake.value = 20;
-
-  els.liveLine.value = 7.5;
-  els.liveOdds.value = -110;
-  els.liveStake.value = 20;
-  els.sliderMax.value = 300;
-
-  updateSideSelectors();
-  syncSliderFromInputs();
-  updateAll();
-}
-
-function syncSliderFromInputs(){
-  const max = Math.max(0, Number(els.sliderMax.value) || 300);
-  els.stakeSlider.max = String(max);
-  const start = clamp(Number(els.liveStake.value) || 20, 0, max);
-  els.stakeSlider.value = String(start);
-  els.liveStakeRead.textContent = `$${Number(els.stakeSlider.value).toFixed(0)}`;
-}
-
-/* =========================
-   Computation + rendering
-========================= */
-function classForMoney(v){
-  if (v > 0.0001) return "pos";
-  if (v < -0.0001) return "neg";
-  return "mid";
-}
-function makeBetSummary(){
-  const type = els.betType.value;
-  const a = els.teamA.value || "Team A";
-  const b = els.teamB.value || "Team B";
-  const preSide = els.pregameSide.value;
-  const preLine = Number(els.pregameLine.value);
-  const preOdds = Number(els.pregameOdds.value);
-  const preStake = Number(els.pregameStake.value);
-
-  const liveSide = els.liveSide.value;
-  const liveLine = Number(els.liveLine.value);
-  const liveOdds = Number(els.liveOdds.value);
-
-  const sideLabel = (s)=>{
-    if (type === "SPREAD" || type === "ML"){
-      return (s === "A") ? a : b;
+    // -------------------------
+    // Helpers: odds math
+    // -------------------------
+    function americanToDecimal(odds){
+      const o = Number(odds);
+      if(!isFinite(o) || o === 0) return 1;
+      if(o > 0) return 1 + (o/100);
+      return 1 + (100/Math.abs(o));
     }
-    return (s === "OVER") ? "Over" : "Under";
-  };
-
-  if (type === "ML"){
-    return `${type}: Pregame ${sideLabel(preSide)} @ ${preOdds} for $${preStake.toFixed(0)} | Live ${sideLabel(liveSide)} @ ${liveOdds}`;
-  }
-  const lineLabel = (type === "SPREAD")
-    ? `${sideLabel(preSide)} ${preLine}`
-    : `${sideLabel(preSide)} ${preLine}`;
-  const lineLabel2 = (type === "SPREAD")
-    ? `${sideLabel(liveSide)} ${liveLine}`
-    : `${sideLabel(liveSide)} ${liveLine}`;
-  return `${type}: Pregame ${lineLabel} @ ${preOdds} for $${preStake.toFixed(0)} | Live ${lineLabel2} @ ${liveOdds}`;
-}
-
-function computeNetForScenario(outcomeKey, liveStakeValue, liveOddsOverride=null){
-  // outcomeKey depends on bet type:
-  // SPREAD: "PREGAME_WINS", "LIVE_WINS", "MIDDLE", "DOUBLE_LOSE", "PUSH_CASE"
-  // TOTAL: same buckets
-  // ML: "A_WINS" or "B_WINS"
-
-  const type = els.betType.value;
-
-  const preStake = Number(els.pregameStake.value) || 0;
-  const preOdds = Number(els.pregameOdds.value) || 0;
-  const preSide = els.pregameSide.value;
-  const preLine = Number(els.pregameLine.value);
-
-  const liveStake = Number(liveStakeValue) || 0;
-  const liveOdds = (liveOddsOverride !== null) ? Number(liveOddsOverride) : (Number(els.liveOdds.value) || 0);
-  const liveSide = els.liveSide.value;
-  const liveLine = Number(els.liveLine.value);
-
-  const preWin = betWinProfit(preStake, preOdds);
-  const liveWin = betWinProfit(liveStake, liveOdds);
-
-  // Default: lose means -stake; push means 0
-  function netFromResults(preRes, liveRes){
-    let net = 0;
-    // pregame
-    if (preRes === "WIN") net += preWin;
-    else if (preRes === "LOSE") net -= preStake;
-    else net += 0;
-
-    // live
-    if (liveRes === "WIN") net += liveWin;
-    else if (liveRes === "LOSE") net -= liveStake;
-    else net += 0;
-
-    return net;
-  }
-
-  if (type === "ML"){
-    const winner = outcomeKey; // "A" or "B"
-    const preRes = resolveML(preSide, winner);
-    const liveRes = resolveML(liveSide, winner);
-    return netFromResults(preRes, liveRes);
-  }
-
-  // SPREAD/TOTAL buckets mapped to abstract results
-  if (outcomeKey === "MIDDLE"){
-    return netFromResults("WIN","WIN");
-  }
-  if (outcomeKey === "PREGAME_WINS"){
-    return netFromResults("WIN","LOSE");
-  }
-  if (outcomeKey === "LIVE_WINS"){
-    return netFromResults("LOSE","WIN");
-  }
-  if (outcomeKey === "DOUBLE_LOSE"){
-    return netFromResults("LOSE","LOSE");
-  }
-  if (outcomeKey === "PUSH_CASE"){
-    // one or both push; treat as 0 for pushes. Use a neutral representative: pre PUSH, live LOSE
-    return netFromResults("PUSH","LOSE");
-  }
-
-  return 0;
-}
-
-function computeMiddleInfo(){
-  const type = els.betType.value;
-  if (type === "ML"){
-    return {hasMiddle:false, size:0, detail:"—", note:"Moneyline has no middle range. Use it as a hedge split."};
-  }
-
-  const preSide = els.pregameSide.value;
-  const liveSide = els.liveSide.value;
-  const preLine = Number(els.pregameLine.value);
-  const liveLine = Number(els.liveLine.value);
-
-  if (!Number.isFinite(preLine) || !Number.isFinite(liveLine)){
-    return {hasMiddle:false, size:0, detail:"—", note:"Enter valid lines to compute a middle range."};
-  }
-
-  // Needs opposite sides to create a gap:
-  // SPREAD: pre on A and live on B (or vice versa)
-  // TOTAL: pre OVER live UNDER (or vice versa)
-  if (type === "SPREAD"){
-    if (preSide === liveSide){
-      return {hasMiddle:false, size:0, detail:"—", note:"Same-side spread bets do not create a middle. This is a hedge-only layout."};
+    function profitForStake(stake, odds){
+      const dec = americanToDecimal(odds);
+      return stake * (dec - 1);
     }
-
-    // Determine winning-margin integers where both win:
-    // Suppose pre is A with line L1 (ex -3.5). Condition: margin + L1 > 0  => margin > -L1
-    // live is B with line L2 (ex +7.5). Condition: (-margin) + L2 > 0 => margin < L2
-    // So middle: -L1 < margin < L2 (open interval; pushes excluded)
-    // If swapped sides, symmetric:
-    // pre B line L1 => margin < L1
-    // live A line L2 => margin > -L2
-    // middle: -L2 < margin < L1
-    let lowOpen, highOpen;
-
-    if (preSide === "A" && liveSide === "B"){
-      lowOpen = -preLine;
-      highOpen = liveLine;
-    } else if (preSide === "B" && liveSide === "A"){
-      lowOpen = -liveLine;
-      highOpen = preLine;
-    } else {
-      return {hasMiddle:false, size:0, detail:"—", note:"Unrecognized spread side mapping."};
+    function fmtMoney(x){
+      const n = Number(x);
+      if(!isFinite(n)) return "$0.00";
+      const sign = n < 0 ? "-" : "";
+      const abs = Math.abs(n);
+      return sign + "$" + abs.toFixed(2);
     }
+    function clamp(n, a, b){ return Math.min(b, Math.max(a, n)); }
 
-    const lo = Math.min(lowOpen, highOpen);
-    const hi = Math.max(lowOpen, highOpen);
+    // -------------------------
+    // Buckets and evaluation
+    // -------------------------
+    function buildBuckets(){
+      const bt = state.betType;
 
-    // Need lo < hi to have any gap; and middle integers are those strictly between.
-    const ints = [];
-    for (let m = Math.ceil(lo + 1e-9); m <= Math.floor(hi - 1e-9); m++){
-      // exclude values that would push either bet (exact equals boundary)
-      if (m > lo && m < hi) ints.push(m);
-    }
-
-    if (ints.length === 0){
-      return {hasMiddle:false, size:0, detail:"—", note:"No middle gap. You can still use the slider to build a hedge profile."};
-    }
-
-    return {hasMiddle:true, size:ints.length, detail:ints.join(", "), note:""};
-  }
-
-  if (type === "TOTAL"){
-    if (preSide === liveSide){
-      return {hasMiddle:false, size:0, detail:"—", note:"Same-side totals do not create a middle. This is a hedge-only layout."};
-    }
-
-    // Both win only if one is OVER at lower number and the other is UNDER at higher number.
-    // Example: Over 45.5 and Under 52.5 => middle totals: 46..52 integers.
-    let overLine, underLine;
-    if (preSide === "OVER" && liveSide === "UNDER"){
-      overLine = preLine;
-      underLine = liveLine;
-    } else if (preSide === "UNDER" && liveSide === "OVER"){
-      overLine = liveLine;
-      underLine = preLine;
-    } else {
-      return {hasMiddle:false, size:0, detail:"—", note:"Unrecognized total side mapping."};
-    }
-
-    const lo = Math.min(overLine, underLine);
-    const hi = Math.max(overLine, underLine);
-
-    // Need overLine < underLine for a middle
-    if (!(overLine < underLine)){
-      return {hasMiddle:false, size:0, detail:"—", note:"No middle gap. You can still hedge outcomes."};
-    }
-
-    const ints = [];
-    for (let t = Math.ceil(lo + 1e-9); t <= Math.floor(hi - 1e-9); t++){
-      if (t > lo && t < hi) ints.push(t);
-    }
-
-    if (ints.length === 0){
-      return {hasMiddle:false, size:0, detail:"—", note:"No middle gap. You can still hedge outcomes."};
-    }
-
-    return {hasMiddle:true, size:ints.length, detail:ints.join(", "), note:""};
-  }
-
-  return {hasMiddle:false, size:0, detail:"—", note:""};
-}
-
-function render(){
-  const type = els.betType.value;
-  const liveStake = Number(els.stakeSlider.value) || 0;
-  els.liveStakeRead.textContent = `$${liveStake.toFixed(0)}`;
-  els.betSummary.textContent = makeBetSummary();
-
-  const a = els.teamA.value || "Team A";
-  const b = els.teamB.value || "Team B";
-
-  const midInfo = computeMiddleInfo();
-  els.middleSize.textContent = midInfo.hasMiddle ? `${midInfo.size}` : "—";
-  els.noMiddleNote.textContent = midInfo.note || "";
-  els.middleDetail.textContent = midInfo.hasMiddle ? midInfo.detail : "—";
-  els.middleTableWrap.classList.toggle("hidden", !midInfo.hasMiddle);
-
-  // compute headline: pick the “best” bucket (middle if exists, otherwise pregame wins for same-side?).
-  let headlineBucket;
-  if (type === "ML"){
-    headlineBucket = "A"; // display A wins as headline reference
-    els.headlineContext.textContent = "Headline shown for: Team A wins. Table shows both win-sides.";
-  } else if (midInfo.hasMiddle){
-    headlineBucket = "MIDDLE";
-    els.headlineContext.textContent = "Headline shown for: middle zone (both bets win). Table shows all buckets.";
-  } else {
-    headlineBucket = "PREGAME_WINS";
-    els.headlineContext.textContent = "Headline shown for: pregame bet wins (live bet loses). Table shows all buckets.";
-  }
-
-  // headline net at entered live odds
-  const headlineNet = computeNetForScenario(headlineBucket, liveStake);
-
-  // headline range with odds drift ±15 (live odds only)
-  const o = Number(els.liveOdds.value) || 0;
-  const r = driftOddsRange(o);
-  const n1 = computeNetForScenario(headlineBucket, liveStake, r.min);
-  const n2 = computeNetForScenario(headlineBucket, liveStake, r.max);
-  const minN = Math.min(n1,n2);
-  const maxN = Math.max(n1,n2);
-
-  els.headlineNet.textContent = fmtMoney(headlineNet);
-  els.headlineNet.className = `bigNum mono ${classForMoney(headlineNet)}`;
-  els.headlineRange.textContent = `(range: ${fmtMoney(minN)} to ${fmtMoney(maxN)} if live odds drift ±15)`;
-
-  // render bucket table
-  els.bucketRows.innerHTML = "";
-
-  if (type === "ML"){
-    const rows = [
-      {
-        key: "A",
-        label: `${a} wins`,
-        desc: `Pregame ${sideNameML(els.pregameSide.value,a,b)} vs Live ${sideNameML(els.liveSide.value,a,b)} resolves to the winner.`,
-      },
-      {
-        key: "B",
-        label: `${b} wins`,
-        desc: `Same stakes/odds, opposite winner.`,
+      if(bt === "ml"){
+        // Only two outcomes: A wins or B wins
+        return [
+          { key:"A", label:"Team A wins",  test: (s)=> s === "A" },
+          { key:"B", label:"Team B wins",  test: (s)=> s === "B" }
+        ];
       }
-    ];
-    rows.forEach(row=>{
-      const net = computeNetForScenario(row.key, liveStake);
-      const nMin = computeNetForScenario(row.key, liveStake, r.min);
-      const nMax = computeNetForScenario(row.key, liveStake, r.max);
-      addBucketRow(row.label, row.desc, net, Math.min(nMin,nMax), Math.max(nMin,nMax));
+
+      // spread / total / prop share a "score" style model:
+      // We'll interpret "s" as final margin for spread, or final total for total/prop.
+      // Buckets: pre wins only, live wins only, both win (middle), push zones, both lose (if possible)
+      return [
+        { key:"PRE", label:"Pregame wins (only)", kind:"pre_only" },
+        { key:"LIVE", label:"Live wins (only)", kind:"live_only" },
+        { key:"MIDDLE", label:"Middle (both win)", kind:"both_win" },
+        { key:"PUSH_PRE", label:"Push pregame", kind:"push_pre" },
+        { key:"PUSH_LIVE", label:"Push live", kind:"push_live" },
+        { key:"BOTH_LOSE", label:"Both lose (if possible)", kind:"both_lose" },
+      ];
+    }
+
+    function outcomeExplain(){
+      const bt = state.betType;
+      const preSide = state.pre.side;
+      const liveSide = state.live.side;
+
+      const A = state.teamA || "Team A";
+      const B = state.teamB || "Team B";
+
+      if(bt === "ml"){
+        return {
+          universe: "ML",
+          describe: (bucketKey) => {
+            if(bucketKey === "A") return `If ${A} wins`;
+            return `If ${B} wins`;
+          }
+        };
+      }
+
+      const metric = (bt === "spread") ? "final margin (Team A score − Team B score)" :
+                     "final total (points/units)";
+
+      // Define win/push/loss tests for each bet, using a single metric value x.
+      const preLine = Number(state.pre.line);
+      const liveLine = Number(state.live.line);
+
+      function betResult(side, line, x){
+        // returns: "win" | "loss" | "push"
+        if(bt === "spread"){
+          // side is A or B; line is spread for that side
+          // If bet on A with line -3.5, condition: margin + (-3.5) > 0
+          // If bet on B with line +7.5, translate to margin for A; B +7.5 means (-margin) + 7.5 > 0 => margin < 7.5
+          let expr;
+          if(side === "A") expr = x + line;
+          else expr = (-x) + line;
+          if(Math.abs(expr) < 1e-9) return "push";
+          return expr > 0 ? "win" : "loss";
+        } else {
+          // total/prop: side over/under; line is total threshold
+          let expr;
+          if(side === "over") expr = x - line;
+          else expr = line - x;
+          if(Math.abs(expr) < 1e-9) return "push";
+          return expr > 0 ? "win" : "loss";
+        }
+      }
+
+      return {
+        universe: metric,
+        describe: (bucketKey) => {
+          if(bucketKey === "MIDDLE") return "Pregame wins and Live wins";
+          if(bucketKey === "PRE") return "Pregame wins and Live loses";
+          if(bucketKey === "LIVE") return "Live wins and Pregame loses";
+          if(bucketKey === "PUSH_PRE") return "Pregame pushes (refund), Live resolves";
+          if(bucketKey === "PUSH_LIVE") return "Live pushes (refund), Pregame resolves";
+          if(bucketKey === "BOTH_LOSE") return "Both lose (rare but possible with some lines)";
+          return "";
+        },
+        betResult
+      };
+    }
+
+    // -------------------------
+    // Compute payouts
+    // -------------------------
+    function compute(){
+      const bt = state.betType;
+
+      const preStake = Number(state.pre.stake) || 0;
+      const preOdds = Number(state.pre.odds) || 0;
+      const liveStake = Number(state.live.stake) || 0;
+      const liveOdds = Number(state.live.odds) || 0;
+
+      const liveOddsMin = liveOdds - state.drift;
+      const liveOddsMax = liveOdds + state.drift;
+
+      const preWinProfit = profitForStake(preStake, preOdds);
+      const liveWinProfit = profitForStake(liveStake, liveOdds);
+      const liveWinProfitMin = profitForStake(liveStake, liveOddsMin);
+      const liveWinProfitMax = profitForStake(liveStake, liveOddsMax);
+
+      const expl = outcomeExplain();
+
+      // KPI: do nothing = either win profit or -stake depending on actual result; since unknown, show both scenarios as a range.
+      // We'll present it as: "Win: +profit, Lose: -stake"
+      const doNothingWin = preWinProfit;
+      const doNothingLose = -preStake;
+
+      $("kpiDoNothing").textContent = `${fmtMoney(doNothingWin)} / ${fmtMoney(doNothingLose)}`;
+      $("kpiDoNothingRange").textContent = `(range: ${fmtMoney(doNothingWin)} to ${fmtMoney(doNothingLose)})`;
+
+      // Build table
+      const tbody = $("outBody");
+      tbody.innerHTML = "";
+
+      let best = -Infinity, bestMin=-Infinity, bestMax=-Infinity;
+      let worst = Infinity, worstMin=Infinity, worstMax=Infinity;
+
+      function addRow(bucket, happens, pnlExact, pnlMin, pnlMax){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>${bucket}</b></td>
+          <td>${happens}</td>
+          <td class="mono ${pnlExact>=0?'goodTxt':'badTxt'}">${fmtMoney(pnlExact)}</td>
+          <td class="mono">${fmtMoney(pnlMin)} to ${fmtMoney(pnlMax)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      if(bt === "ml"){
+        // Determine which team each bet is on: preSide is A/B, liveSide is A/B (we keep select values)
+        const A = state.teamA || "Team A";
+        const B = state.teamB || "Team B";
+
+        // Outcome: A wins
+        const preA = (state.pre.side === "A");
+        const liveA = (state.live.side === "A");
+
+        const pnlA_exact = (preA ? preWinProfit : -preStake) + (liveA ? liveWinProfit : -liveStake);
+        const pnlA_min   = (preA ? preWinProfit : -preStake) + (liveA ? liveWinProfitMin : -liveStake);
+        const pnlA_max   = (preA ? preWinProfit : -preStake) + (liveA ? liveWinProfitMax : -liveStake);
+
+        // Outcome: B wins
+        const preB = (state.pre.side === "B");
+        const liveB = (state.live.side === "B");
+
+        const pnlB_exact = (preB ? preWinProfit : -preStake) + (liveB ? liveWinProfit : -liveStake);
+        const pnlB_min   = (preB ? preWinProfit : -preStake) + (liveB ? liveWinProfitMin : -liveStake);
+        const pnlB_max   = (preB ? preWinProfit : -preStake) + (liveB ? liveWinProfitMax : -liveStake);
+
+        addRow(`${A} wins`, `If ${A} wins`, pnlA_exact, pnlA_min, pnlA_max);
+        addRow(`${B} wins`, `If ${B} wins`, pnlB_exact, pnlB_min, pnlB_max);
+
+        // KPIs
+        best = Math.max(pnlA_exact, pnlB_exact);
+        worst = Math.min(pnlA_exact, pnlB_exact);
+        bestMin = Math.max(pnlA_min, pnlB_min);
+        bestMax = Math.max(pnlA_max, pnlB_max);
+        worstMin = Math.min(pnlA_min, pnlB_min);
+        worstMax = Math.min(pnlA_max, pnlB_max);
+
+        $("kpiBest").textContent = fmtMoney(best);
+        $("kpiBestRange").textContent = `(range: ${fmtMoney(bestMin)} to ${fmtMoney(bestMax)})`;
+        $("kpiWorst").textContent = fmtMoney(worst);
+        $("kpiWorstRange").textContent = `(range: ${fmtMoney(worstMin)} to ${fmtMoney(worstMax)})`;
+
+        $("preWinProfit").textContent = fmtMoney(preWinProfit);
+        $("liveWinProfit").textContent = fmtMoney(liveWinProfit);
+        $("liveWinProfitRange").textContent = `(range: ${fmtMoney(liveWinProfitMin)} to ${fmtMoney(liveWinProfitMax)})`;
+
+        $("headline").textContent = fmtMoney(best);
+        $("headlineSub").textContent = `(live odds drift range: ${fmtMoney(bestMin)} to ${fmtMoney(bestMax)})`;
+
+        $("middleNote").textContent = `ML: No “middle window” like spreads/totals. This is a hedge calculator for win/lose outcomes.`;
+        return;
+      }
+
+      const preSide = state.pre.side;
+      const liveSide = state.live.side;
+      const preLine = Number(state.pre.line);
+      const liveLine = Number(state.live.line);
+
+      const btRes = expl.betResult;
+
+      // Evaluate representative points to create bucket rows:
+      // We'll pick key boundary values based on lines. This is heuristic but produces correct classifications around thresholds.
+      // For spreads: thresholds for each bet are at x = -line (A side) or x = line (B side), etc. We'll sample around both.
+      // For totals/props: thresholds at x = line.
+      const samples = [];
+      function addSample(x){ if(isFinite(x)) samples.push(x); }
+      if(state.betType === "spread"){
+        // thresholds where each bet pushes:
+        const prePush = (preSide==="A") ? -preLine : preLine;
+        const livePush = (liveSide==="A") ? -liveLine : liveLine;
+        addSample(prePush-0.5); addSample(prePush); addSample(prePush+0.5);
+        addSample(livePush-0.5); addSample(livePush); addSample(livePush+0.5);
+      } else {
+        addSample(preLine-0.5); addSample(preLine); addSample(preLine+0.5);
+        addSample(liveLine-0.5); addSample(liveLine); addSample(liveLine+0.5);
+      }
+
+      // Deduplicate + sort
+      const uniq = Array.from(new Set(samples.map(x=>Number(x).toFixed(6)))).map(x=>Number(x));
+      uniq.sort((a,b)=>a-b);
+
+      // Determine bucket payout for each sample, then collapse into buckets
+      const buckets = new Map(); // key -> {label, happens, pnlExact, pnlMin, pnlMax}
+      function keyFromResults(rPre, rLive){
+        if(rPre==="win" && rLive==="win") return "MIDDLE";
+        if(rPre==="win" && rLive==="loss") return "PRE";
+        if(rPre==="loss" && rLive==="win") return "LIVE";
+        if(rPre==="push" && rLive!=="push") return "PUSH_PRE";
+        if(rLive==="push" && rPre!=="push") return "PUSH_LIVE";
+        if(rPre==="push" && rLive==="push") return "DOUBLE_PUSH";
+        if(rPre==="loss" && rLive==="loss") return "BOTH_LOSE";
+        return "OTHER";
+      }
+
+      function pnlFor(rPre, rLive, liveProfit){
+        const prePnl = (rPre==="win") ? preWinProfit : (rPre==="push" ? 0 : -preStake);
+        const livePnl = (rLive==="win") ? liveProfit : (rLive==="push" ? 0 : -liveStake);
+        return prePnl + livePnl;
+      }
+
+      uniq.forEach(x=>{
+        const rPre = btRes(preSide, preLine, x);
+        const rLive = btRes(liveSide, liveLine, x);
+
+        const k = keyFromResults(rPre, rLive);
+
+        const pnlExact = pnlFor(rPre, rLive, liveWinProfit);
+        const pnlMin   = pnlFor(rPre, rLive, liveWinProfitMin);
+        const pnlMax   = pnlFor(rPre, rLive, liveWinProfitMax);
+
+        if(!buckets.has(k)){
+          buckets.set(k, {
+            key:k,
+            label:k,
+            happens: expl.describe(k),
+            pnlExact, pnlMin, pnlMax
+          });
+        } else {
+          // Keep worst-to-best range for that bucket
+          const b = buckets.get(k);
+          b.pnlExact = Math.min(b.pnlExact, pnlExact); // pick conservative representative
+          b.pnlMin = Math.min(b.pnlMin, pnlMin);
+          b.pnlMax = Math.max(b.pnlMax, pnlMax);
+        }
+
+        best = Math.max(best, pnlExact);
+        worst = Math.min(worst, pnlExact);
+        bestMin = Math.max(bestMin, pnlMin);
+        bestMax = Math.max(bestMax, pnlMax);
+        worstMin = Math.min(worstMin, pnlMin);
+        worstMax = Math.min(worstMax, pnlMax);
+      });
+
+      // Render rows in a logical order
+      const order = ["MIDDLE","PRE","LIVE","PUSH_PRE","PUSH_LIVE","DOUBLE_PUSH","BOTH_LOSE","OTHER"];
+      order.forEach(k=>{
+        if(!buckets.has(k)) return;
+        const b = buckets.get(k);
+
+        let name = b.label;
+        if(k==="MIDDLE") name = "Middle window";
+        if(k==="PRE") name = "Pregame covers only";
+        if(k==="LIVE") name = "Live bet covers only";
+        if(k==="PUSH_PRE") name = "Pregame push";
+        if(k==="PUSH_LIVE") name = "Live push";
+        if(k==="DOUBLE_PUSH") name = "Double push";
+        if(k==="BOTH_LOSE") name = "Both lose";
+        if(k==="OTHER") name = "Other edge-case";
+
+        addRow(name, b.happens, b.pnlExact, b.pnlMin, b.pnlMax);
+      });
+
+      $("kpiBest").textContent = fmtMoney(best);
+      $("kpiBestRange").textContent = `(range: ${fmtMoney(bestMin)} to ${fmtMoney(bestMax)})`;
+      $("kpiWorst").textContent = fmtMoney(worst);
+      $("kpiWorstRange").textContent = `(range: ${fmtMoney(worstMin)} to ${fmtMoney(worstMax)})`;
+
+      $("preWinProfit").textContent = fmtMoney(preWinProfit);
+      $("liveWinProfit").textContent = fmtMoney(liveWinProfit);
+      $("liveWinProfitRange").textContent = `(range: ${fmtMoney(liveWinProfitMin)} to ${fmtMoney(liveWinProfitMax)})`;
+
+      // Headline: show current stake’s best-case exact + drift
+      $("headline").textContent = fmtMoney(best);
+      $("headlineSub").textContent = `(live odds drift range: ${fmtMoney(bestMin)} to ${fmtMoney(bestMax)})`;
+
+      // Middle note: interpret window
+      const A = state.teamA || "Team A";
+      const B = state.teamB || "Team B";
+      let note = "";
+      if(bt === "spread"){
+        note = `Spread math uses final margin (A − B). Pregame: ${sideText(preSide,A,B)} ${fmtLine(preLine)} at ${fmtOdds(preOdds)} on ${fmtMoney(preStake)}. Live: ${sideText(liveSide,A,B)} ${fmtLine(liveLine)} at ${fmtOdds(liveOdds)} on ${fmtMoney(liveStake)}.`;
+      } else {
+        note = `${bt.toUpperCase()} math uses final total compared to line. Pregame: ${sideText(preSide,A,B)} ${fmtLine(preLine)} at ${fmtOdds(preOdds)} on ${fmtMoney(preStake)}. Live: ${sideText(liveSide,A,B)} ${fmtLine(liveLine)} at ${fmtOdds(liveOdds)} on ${fmtMoney(liveStake)}.`;
+      }
+      $("middleNote").textContent = note;
+    }
+
+    function fmtOdds(o){
+      const n = Number(o);
+      if(!isFinite(n)) return "";
+      return (n>0?`+${n}`:`${n}`);
+    }
+    function fmtLine(x){
+      if(x === null || x === undefined || x === "" || !isFinite(Number(x))) return "";
+      const n = Number(x);
+      return (n>0?`+${n}`:`${n}`);
+    }
+    function sideText(s, A, B){
+      if(s==="A") return A;
+      if(s==="B") return B;
+      if(s==="over") return "Over";
+      if(s==="under") return "Under";
+      return s;
+    }
+
+    // -------------------------
+    // UI: step navigation
+    // -------------------------
+    const panels = ["panel1","panel2","panel3","panel4"];
+    function showStep(n){
+      panels.forEach((pid, idx)=>{
+        $(pid).classList.toggle("hidden", idx !== (n-1));
+      });
+      document.querySelectorAll(".step").forEach(el=>{
+        el.classList.toggle("active", Number(el.dataset.step) === n);
+      });
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    // Stepper click
+    document.querySelectorAll(".step").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        const n = Number(el.dataset.step);
+        showStep(n);
+      });
     });
-    return;
-  }
 
-  // SPREAD/TOTAL buckets
-  const buckets = [];
-
-  if (midInfo.hasMiddle){
-    buckets.push({
-      key:"MIDDLE",
-      label:"Middle zone (double win)",
-      desc:"Both bets win inside the gap."
+    $("to2").addEventListener("click", ()=>showStep(2));
+    $("back1").addEventListener("click", ()=>showStep(1));
+    $("to3").addEventListener("click", ()=>showStep(3));
+    $("back2").addEventListener("click", ()=>showStep(2));
+    $("to4").addEventListener("click", ()=>{
+      compute();
+      showStep(4);
     });
-  }
-  buckets.push({
-    key:"PREGAME_WINS",
-    label:"Pregame wins / Live loses",
-    desc:"Game lands on the pregame side beyond the gap (or if no gap: the pregame side outcome)."
-  });
-  buckets.push({
-    key:"LIVE_WINS",
-    label:"Live wins / Pregame loses",
-    desc:"Game lands on the live side beyond the gap (or if no gap: the live side outcome)."
-  });
-  buckets.push({
-    key:"DOUBLE_LOSE",
-    label:"Both lose (worst case)",
-    desc:"If bets are mis-aligned (no gap) you can create a zone where both lose. This row shows that maximum damage scenario."
-  });
+    $("back3").addEventListener("click", ()=>showStep(3));
 
-  // push note
-  buckets.push({
-    key:"PUSH_CASE",
-    label:"Push edge case",
-    desc:"If a line is a whole number and the result hits exactly, that leg can push (treated as 0 profit/loss)."
-  });
+    // Copy summary
+    $("copySummary").addEventListener("click", async ()=>{
+      const A = state.teamA || "Team A";
+      const B = state.teamB || "Team B";
+      const lines = [];
+      lines.push(`Will’s Middling & Hedge Calculator`);
+      lines.push(`League: ${state.league} • Bet type: ${state.betType}`);
+      lines.push(`Teams: ${A} vs ${B}`);
+      lines.push(`Pregame: ${sideText(state.pre.side,A,B)} ${fmtLine(state.pre.line)} • stake ${fmtMoney(state.pre.stake)} • odds ${fmtOdds(state.pre.odds)}`);
+      lines.push(`Live: ${sideText(state.live.side,A,B)} ${fmtLine(state.live.line)} • stake ${fmtMoney(state.live.stake)} • odds ${fmtOdds(state.live.odds)} (±${state.drift})`);
+      lines.push(`Best-case: ${$("kpiBest").textContent} ${$("kpiBestRange").textContent}`);
+      lines.push(`Worst-case: ${$("kpiWorst").textContent} ${$("kpiWorstRange").textContent}`);
+      const txt = lines.join("\n");
+      try{
+        await navigator.clipboard.writeText(txt);
+        $("copyMsg").textContent = "Copied.";
+        setTimeout(()=>{$("copyMsg").textContent="";}, 1200);
+      }catch(e){
+        $("copyMsg").textContent = "Copy failed (clipboard permission).";
+      }
+    });
 
-  buckets.forEach(b=>{
-    const net = computeNetForScenario(b.key, liveStake);
-    const nMin = computeNetForScenario(b.key, liveStake, r.min);
-    const nMax = computeNetForScenario(b.key, liveStake, r.max);
-    addBucketRow(b.label, b.desc, net, Math.min(nMin,nMax), Math.max(nMin,nMax));
-  });
-}
+    // -------------------------
+    // League/team dropdowns
+    // -------------------------
+    function fillTeams(){
+      const league = $("league").value;
+      const list = TEAMS[league] || ["Team A","Team B"];
+      const aSel = $("teamA");
+      const bSel = $("teamB");
+      aSel.innerHTML = "";
+      bSel.innerHTML = "";
 
-function sideNameML(val,a,b){
-  return (val==="A") ? a : b;
-}
+      list.forEach(t=>{
+        const oa = document.createElement("option");
+        oa.value = t; oa.textContent = t;
+        aSel.appendChild(oa);
 
-function addBucketRow(label, desc, net, netMin, netMax){
-  const tr = document.createElement("tr");
-  const td1 = document.createElement("td");
-  const td2 = document.createElement("td");
-  const td3 = document.createElement("td");
-  const td4 = document.createElement("td");
+        const ob = document.createElement("option");
+        ob.value = t; ob.textContent = t;
+        bSel.appendChild(ob);
+      });
 
-  td1.innerHTML = `<b>${label}</b>`;
-  td2.innerHTML = `<span class="muted">${desc}</span>`;
-  td3.innerHTML = `<span class="mono ${classForMoney(net)}"><b>${fmtMoney(net)}</b></span>`;
-  td4.innerHTML = `<span class="mono muted">${fmtMoney(netMin)} to ${fmtMoney(netMax)}</span>`;
+      // Keep defaults unless user already picked something valid
+      if(!list.includes(state.teamA)) state.teamA = "Team A";
+      if(!list.includes(state.teamB)) state.teamB = "Team B";
 
-  tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
-  els.bucketRows.appendChild(tr);
-}
+      aSel.value = state.teamA;
+      bSel.value = state.teamB;
+    }
 
-function updateAll(){
-  render();
-}
+    $("league").addEventListener("change", ()=>{
+      state.league = $("league").value;
+      fillTeams();
+    });
 
-/* =========================
-   Event listeners
-========================= */
-els.league.addEventListener("change", populateTeams);
-els.teamA.addEventListener("change", updateLabels);
-els.teamB.addEventListener("change", updateLabels);
+    $("teamA").addEventListener("change", ()=> state.teamA = $("teamA").value );
+    $("teamB").addEventListener("change", ()=> state.teamB = $("teamB").value );
 
-els.betType.addEventListener("change", ()=>{
-  updateSideSelectors();
-  updateAll();
-});
+    // -------------------------
+    // Bet type pills
+    // -------------------------
+    document.querySelectorAll("#betTypeRow .pill").forEach(p=>{
+      p.addEventListener("click", ()=>{
+        document.querySelectorAll("#betTypeRow .pill").forEach(x=>x.classList.remove("active"));
+        p.classList.add("active");
+        state.betType = p.dataset.type;
+        syncBetTypeUI();
+      });
+    });
 
-[
-  els.pregameSide, els.pregameLine, els.pregameOdds, els.pregameStake,
-  els.liveSide, els.liveLine, els.liveOdds, els.liveStake, els.sliderMax
-].forEach(el=>{
-  el.addEventListener("input", ()=>{
-    updateSideSelectors();
-    syncSliderFromInputs();
-    updateAll();
-  });
-});
+    function syncBetTypeUI(){
+      const bt = state.betType;
 
-els.stakeSlider.addEventListener("input", ()=>{
-  els.liveStakeRead.textContent = `$${Number(els.stakeSlider.value).toFixed(0)}`;
-  updateAll();
-});
+      // Side selects
+      const preSide = $("preSide");
+      const liveSide = $("liveSide");
+      preSide.innerHTML = "";
+      liveSide.innerHTML = "";
 
-// navigation
-els.to2a.addEventListener("click", ()=>{ setStepper(2); scrollToPanel(els.panel2); });
-els.to3a.addEventListener("click", ()=>{ setStepper(3); scrollToPanel(els.panel3); });
-els.to4a.addEventListener("click", ()=>{ setStepper(4); scrollToPanel(els.panel4); });
+      if(bt === "spread" || bt === "ml"){
+        // Team A/B only
+        ["A","B"].forEach(v=>{
+          const o1 = document.createElement("option");
+          o1.value = v; o1.textContent = (v==="A" ? "Team A" : "Team B");
+          preSide.appendChild(o1);
 
-els.back1a.addEventListener("click", ()=>{ setStepper(1); scrollToPanel(els.panel1); });
-els.back2a.addEventListener("click", ()=>{ setStepper(2); scrollToPanel(els.panel2); });
-els.back3a.addEventListener("click", ()=>{ setStepper(3); scrollToPanel(els.panel3); });
+          const o2 = document.createElement("option");
+          o2.value = v; o2.textContent = (v==="A" ? "Team A" : "Team B");
+          liveSide.appendChild(o2);
+        });
+        // Default hedge to opposite
+        state.pre.side = "A";
+        state.live.side = "B";
+        $("preSide").value = state.pre.side;
+        $("liveSide").value = state.live.side;
 
-els.reset.addEventListener("click", ()=>{
-  resetDefaults();
-  setStepper(1);
-  scrollToPanel(els.panel1);
-});
+        $("preLineHint").textContent = (bt==="ml")
+          ? "Moneyline: line not used (can leave blank)."
+          : "Examples: -3.5, +7.5";
+        $("liveLineHint").textContent = (bt==="ml")
+          ? "Moneyline: line not used (can leave blank)."
+          : "Examples: +7.5, -2.5";
 
-// stepper click jump
-[...els.stepper.querySelectorAll(".step")].forEach(s=>{
-  s.addEventListener("click", ()=>{
-    const n = Number(s.dataset.step);
-    setStepper(n);
-    scrollToPanel([els.panel1,els.panel2,els.panel3,els.panel4][n-1]);
-  });
-});
+      } else {
+        // Over/Under
+        ["over","under"].forEach(v=>{
+          const o1 = document.createElement("option");
+          o1.value = v; o1.textContent = (v==="over" ? "Over" : "Under");
+          preSide.appendChild(o1);
 
-/* =========================
-   Init
-========================= */
-populateTeams();
-resetDefaults();
-setStepper(1);
-</script>
+          const o2 = document.createElement("option");
+          o2.value = v; o2.textContent = (v==="over" ? "Over" : "Under");
+          liveSide.appendChild(o2);
+        });
+        state.pre.side = "over";
+        state.live.side = "under";
+        $("preSide").value = state.pre.side;
+        $("liveSide").value = state.live.side;
+
+        $("preLineHint").textContent = "Examples: 45.5 (total) • 3.5 (prop)";
+        $("liveLineHint").textContent = "Examples: 52.5 (total) • 4.5 (prop)";
+      }
+
+      // Preserve entered lines; for ML, allow blank line but keep as number internally
+      if(bt === "ml"){
+        $("preLine").value = "";
+        $("liveLine").value = "";
+      } else {
+        if($("preLine").value === "") $("preLine").value = state.pre.line ?? 0;
+        if($("liveLine").value === "") $("liveLine").value = state.live.line ?? 0;
+      }
+    }
+
+    // -------------------------
+    // Bind inputs
+    // -------------------------
+    $("preSide").addEventListener("change", ()=> state.pre.side = $("preSide").value);
+    $("preLine").addEventListener("input", ()=> state.pre.line = Number($("preLine").value));
+    $("preStake").addEventListener("input", ()=> state.pre.stake = Number($("preStake").value));
+    $("preOdds").addEventListener("input", ()=> state.pre.odds = Number($("preOdds").value));
+
+    $("liveSide").addEventListener("change", ()=> state.live.side = $("liveSide").value);
+    $("liveLine").addEventListener("input", ()=> state.live.line = Number($("liveLine").value));
+    $("liveOdds").addEventListener("input", ()=> state.live.odds = Number($("liveOdds").value));
+
+    $("liveStakeMax").addEventListener("input", ()=>{
+      const max = Math.max(0, Number($("liveStakeMax").value) || 0);
+      state.live.max = max;
+      $("liveStake").max = String(max);
+      // keep current value within range
+      const v = clamp(Number($("liveStake").value)||0, 0, max);
+      $("liveStake").value = String(v);
+      state.live.stake = v;
+      $("liveStakeLabel").textContent = fmtMoney(v);
+    });
+
+    $("liveStake").addEventListener("input", ()=>{
+      const v = Number($("liveStake").value) || 0;
+      state.live.stake = v;
+      $("liveStakeLabel").textContent = fmtMoney(v);
+    });
+
+    // -------------------------
+    // Init defaults
+    // -------------------------
+    fillTeams();
+    syncBetTypeUI();
+
+    // Default stakes to $20 across components
+    $("preStake").value = 20;
+    $("liveStake").value = 20;
+    $("liveStakeLabel").textContent = "$20";
+    state.pre.stake = 20;
+    state.live.stake = 20;
+
+    // Ensure max slider matches
+    $("liveStake").max = $("liveStakeMax").value;
+
+  </script>
+
+  <div class="giftBottom">
+    <img src="bottom%20photo.png" alt="Will’s Middling & Hedging Calculator - Bottom Banner" loading="lazy" decoding="async"/>
+  </div>
 </body>
 </html>
