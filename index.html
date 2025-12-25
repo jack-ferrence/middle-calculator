@@ -28,6 +28,58 @@
                   var(--bg);
       color:var(--text);
     }
+
+    /* ===== Decorative images (added) ===== */
+    .topBanner, .bottomBanner{
+      width:100%;
+      display:block;
+      object-fit:cover;
+      max-height: 320px;
+      border-bottom: 1px solid rgba(37,48,82,.8);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      background: rgba(11,13,18,.65);
+    }
+    .bottomBanner{
+      border-top: 1px solid rgba(37,48,82,.8);
+      border-bottom: none;
+      box-shadow: 0 -18px 60px rgba(0,0,0,.45);
+      max-height: 260px;
+    }
+
+    .sideAd{
+      position: fixed;
+      top: 110px;
+      width: 210px;
+      z-index: 20;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(37,48,82,.85);
+      background: rgba(11,13,18,.55);
+      box-shadow: 0 20px 70px rgba(0,0,0,.55);
+      transform: translateZ(0);
+      user-select: none;
+      pointer-events: none; /* decoration only; doesn't block clicks */
+    }
+    .sideAd.left{
+      left: 14px;
+      transform: rotate(-2.2deg);
+    }
+    .sideAd.right{
+      right: 14px;
+      transform: rotate(2.2deg);
+    }
+    .sideAd img{
+      display:block;
+      width:100%;
+      height:auto;
+    }
+
+    /* Don’t let side images crowd small screens */
+    @media (max-width: 1240px){
+      .sideAd{display:none;}
+    }
+
+    /* ===== Existing layout ===== */
     .wrap{max-width:1100px;margin:28px auto;padding:0 16px 56px}
     header{
       display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px
@@ -235,6 +287,17 @@
   </style>
 </head>
 <body>
+  <!-- Decorative top banner (added) -->
+  <img class="topBanner" src="top photo.png" alt="Top banner" />
+
+  <!-- Decorative side “pop-up ad” style images (added) -->
+  <div class="sideAd left" aria-hidden="true">
+    <img src="photo 1.png" alt="" />
+  </div>
+  <div class="sideAd right" aria-hidden="true">
+    <img src="photo 2.png" alt="" />
+  </div>
+
   <div class="wrap">
     <header>
       <div>
@@ -509,6 +572,9 @@
 
     </div>
   </div>
+
+  <!-- Decorative bottom banner (added) -->
+  <img class="bottomBanner" src="bottom photo.png" alt="Bottom banner" />
 
 <script>
 /* =========================
